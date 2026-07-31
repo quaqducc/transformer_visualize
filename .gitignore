@@ -1,0 +1,14 @@
+# deps / build
+node_modules/
+dist/
+.cache/
+
+# vercel
+.vercel/
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
