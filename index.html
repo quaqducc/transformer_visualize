@@ -559,7 +559,7 @@ function focusPan(nodeId,y2,p2,z2){const cy=Math.cos(y2),sy=Math.sin(y2),cp=Math
   return{panX:q.x-bcx,panY:q.y-bcy};}
 function animatePose(y2,p2,z2,px2,py2){const y0=yaw,p0=pitch,z0=zoom,x0=panX,pY0=panY,t0=performance.now(),dur=matchMedia('(prefers-reduced-motion:reduce)').matches?0:720;
   if(poseAnim)cancelAnimationFrame(poseAnim);const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
-  (function fr(now){const t=dur?Math.min(1,(now-t0)/dur):1,e=ease(t);yaw=y0+(y2-y0)*e;pitch=p0+(p2-p0)*e;zoom=z0+(z2-z0)*e;panX=x0+(px2-x0)*e;panY=pY0+(py2-py0)*e;renderScene();if(t<1)poseAnim=requestAnimationFrame(fr);else poseAnim=null;})(performance.now());}
+  (function fr(now){const t=dur?Math.min(1,(now-t0)/dur):1,e=ease(t);yaw=y0+(y2-y0)*e;pitch=p0+(p2-p0)*e;zoom=z0+(z2-z0)*e;panX=x0+(px2-x0)*e;panY=pY0+(py2-pY0)*e;renderScene();if(t<1)poseAnim=requestAnimationFrame(fr);else poseAnim=null;})(performance.now());}
 function tourGoto(k){k=Math.max(0,Math.min(TOUR.length-1,k));tourStep=k;const s=TOUR[k];
   const y2=s.yaw!=null?s.yaw:yaw,p2=s.pitch!=null?s.pitch:pitch,z2=s.zoom!=null?s.zoom:2.4;
   let tpx=0,tpy=0;if(s.node){const f=focusPan(s.node,y2,p2,z2);tpx=f.panX;tpy=f.panY;}
