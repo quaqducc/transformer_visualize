@@ -161,6 +161,27 @@
   #tip{position:fixed;z-index:100;pointer-events:none;opacity:0;transition:opacity .1s;background:var(--ink);color:var(--surface);font-family:var(--mono);font-size:12px;padding:6px 9px;border-radius:7px;box-shadow:var(--shadow);white-space:nowrap}
   #tip .v{font-weight:700}
   :root[data-theme="dark"] #tip,:root:not([data-theme="light"]) #tip{color:#0b0e13}
+  .purpose{background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:10px;padding:9px 12px;margin-bottom:8px;font-size:13px;color:var(--ink);line-height:1.55}
+  .purpose b{color:var(--accent)}.purpose .warn{color:var(--gold);font-weight:600}
+  .introveil{position:absolute;inset:0;z-index:8;display:flex;align-items:center;justify-content:center;padding:18px;background:color-mix(in srgb,var(--surface) 72%,transparent);backdrop-filter:blur(3px)}
+  .introveil.hidden{display:none}
+  .introcard{max-width:430px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:22px}
+  .introcard h3{margin:0 0 8px;font-size:20px;letter-spacing:-.01em;text-wrap:balance}
+  .introcard p{margin:0 0 10px;font-size:14px;color:var(--ink-2);line-height:1.55}.introcard p b{color:var(--ink)}
+  .introcard .warn{font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border-left:3px solid var(--gold);border-radius:8px;padding:9px 11px;margin:12px 0 16px}
+  .introcard .warn b{color:var(--ink)}
+  .introcard .row{display:flex;gap:8px;flex-wrap:wrap}
+  .tourcard{position:absolute;left:12px;right:12px;bottom:12px;z-index:9;background:var(--surface);border:1px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:13px 15px;display:none}
+  .tourcard.on{display:block}
+  .tourcard .ti{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .tourcard h4{margin:3px 0 0;font-size:15.5px}
+  .tourcard p{margin:5px 0 0;font-size:13.5px;color:var(--ink-2);line-height:1.5}
+  .tourcard .tc{display:flex;justify-content:space-between;align-items:center;margin-top:11px;gap:10px;flex-wrap:wrap}
+  .tourcard .dots{display:flex;gap:4px;flex-wrap:wrap}
+  .tourcard .d{width:6px;height:6px;border-radius:50%;background:var(--line)}.tourcard .d.on{background:var(--accent)}
+  .arcwrap{border:1px solid var(--line);border-radius:9px;background:var(--surface-2);padding:6px 8px;margin-top:4px}
+  .arcsvg{width:100%;height:auto;display:block;font-family:var(--mono)}
+  .arctok{font-size:12px}.archint{font-size:9.5px;fill:var(--muted)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -168,10 +189,15 @@
   <div class="brand">🧊 <span>Transformer</span> <span class="b">· tháp 3D</span></div>
   <input id="input" type="text" value="the cat sat on the mat" autocomplete="off" spellcheck="false">
   <div class="ctrls">
-    <button class="btn primary" id="run">▶ Chạy</button>
+    <button class="btn primary" id="tourbtn" title="Hướng dẫn cho người mới">🎓 Học nhanh</button>
+    <button class="btn" id="run">▶ Chạy</button>
     <button class="btn" id="prev" title="Bước trước">‹</button>
     <button class="btn" id="next" title="Bước sau">›</button>
     <button class="btn" id="reset" title="Về đầu">↺</button>
+  </div>
+  <div class="seg" id="simpleseg" title="Nhãn dễ hiểu hay thuật ngữ">
+    <button data-s="1" aria-pressed="false">🧑‍🏫 Dễ hiểu</button>
+    <button data-s="0" aria-pressed="true">Thuật ngữ</button>
   </div>
   <div class="seg" id="modeseg" title="Chế độ trọng số">
     <button data-m="interp" aria-pressed="true">🔎 Diễn giải</button>
@@ -182,7 +208,8 @@
 
 <div class="app">
   <div class="stage3d">
-    <p class="panelabel"><span>Kiến trúc 3D (GPT decoder-only)</span><span class="hint">🖱️ kéo để xoay · bấm khối để xem</span></p>
+    <p class="panelabel"><span>Kiến trúc 3D (GPT decoder-only)</span><span class="hint">🖱️ kéo xoay · cuộn zoom · bấm khối</span></p>
+    <div class="purpose" id="purpose"></div>
     <div class="paramtotal" id="ptotal"></div>
     <div class="scene-wrap" id="sceneWrap">
       <div id="scene"></div>
@@ -193,6 +220,14 @@
         <button class="btn" id="vFront">Chính diện</button>
         <button class="btn" id="vIso">Góc 3D</button>
       </div>
+      <div class="tourcard" id="tourcard"><span class="ti" id="tstep"></span><h4 id="ttitle"></h4><p id="ttext"></p>
+        <div class="tc"><div class="dots" id="tdots"></div><div class="ctrls"><button class="btn" id="tprev">‹ Trước</button><button class="btn primary" id="tnext">Tiếp ›</button><button class="btn" id="texit">Thoát</button></div></div></div>
+      <div class="introveil" id="introveil"><div class="introcard">
+        <h3>👋 Đây là cách một AI đoán từ tiếp theo</h3>
+        <p>Bạn nhập một câu; mô hình đọc <b>từ dưới lên</b> qua các tầng rồi <b>đoán từ kế tiếp</b>. Mỗi khối là một bước xử lý — bấm vào để xem chi tiết &amp; số thật.</p>
+        <div class="warn">⚠️ Đây là model <b>đồ chơi, chưa được train</b> nên từ đoán ra <b>chưa có nghĩa</b>. Ta xem <b>cách hoạt động</b>, không phải chất lượng dự đoán.</div>
+        <div class="row"><button class="btn primary" id="introTour">▶ Đi tour 1 phút</button><button class="btn" id="introSkip">Tự khám phá</button></div>
+      </div></div>
     </div>
   </div>
   <div>
@@ -278,28 +313,28 @@ const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[
 const truncate=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
 
 /* ================= 3D SCENE ================= */
-let yaw=-0.62,pitch=0.34,zoom=1,panX=0,panY=0,lastVB=null,vbBase=null,spotlight=false;
+let yaw=-0.62,pitch=0.34,zoom=1,panX=0,panY=0,lastVB=null,vbBase=null,spotlight=false,simple=false,tourStep=-1,poseAnim=null;
 const stepOf=id=>FLOW.indexOf(id);
 function shade(hex,f){const c=hex2rgb(hex);return`rgb(${Math.round(c[0]*(1-f))},${Math.round(c[1]*(1-f))},${Math.round(c[2]*(1-f))})`;}
 const FILL={io:'#e7ebef',embed:'#f7d1d7',add:'#e9edb0',mlp:'#bfe1f0',norm:'#e5dba6',linear:'#d2d3f0',softmax:'#cfe9cf',h0:'#cfe0f7',h1:'#f8dcb4',h2:'#cdeeda'};
 let SCENE={cards:[],links:[],labels:[]};
 function build3D(){const cards=[],links=[],labels=[];const xO=158,zH=98;const interp=!!W.interp;
   const card=(id,x,y,z,w,h,type,title,sub)=>cards.push({id,x,y,z,w,h,type,title,sub});
-  card('token',0,0,0,120,30,'io','Token hoá','');
-  card('embed',0,86,0,150,34,'embed','Embedding','+ vị trí');
+  card('token',0,0,0,124,30,'io',simple?'Cắt thành từ':'Token hoá',simple?'token hoá':'');
+  card('embed',0,86,0,158,34,'embed',simple?'Từ → số':'Embedding',simple?'embedding':'+ vị trí');
   const geo={};
   [0,1].forEach(b=>{const base=190+b*350;const attnY=base,add1Y=base+92,mlpY=base+176,add2Y=base+258;
     geo[b]={attnY,add1Y,mlpY,add2Y};
-    for(let hh=0;hh<3;hh++)card(`b${b}-attn`,xO,attnY,(hh-1)*zH,110,32,'h'+hh,interp?HEAD_SHORT[hh]:('Head '+(hh+1)),'');
+    for(let hh=0;hh<3;hh++)card(`b${b}-attn`,xO,attnY,(hh-1)*zH,114,34,'h'+hh,interp?HEAD_SHORT[hh]:('Head '+(hh+1)),simple?'chú ý':'');
     card(`b${b}-add1`,0,add1Y,0,60,28,'add','＋','');
-    card(`b${b}-mlp`,xO,mlpY,0,124,34,'mlp','MLP','FFN');
+    card(`b${b}-mlp`,xO,mlpY,0,130,34,'mlp',simple?'Suy nghĩ thêm':'MLP',simple?'MLP':'FFN');
     card(`b${b}-add2`,0,add2Y,0,60,28,'add','＋','');
     labels.push({x:-150,y:(attnY+add2Y)/2,z:0,text:'Block '+(b+1)});
   });
   const lnfY=190+2*350+70,logY=lnfY+78,smY=logY+72;
-  card('lnf',0,lnfY,0,140,30,'norm','LayerNorm','cuối');
-  card('logits',0,logY,0,124,30,'linear','Linear','logits');
-  card('sample',0,smY,0,124,30,'softmax','Softmax','xác suất');
+  card('lnf',0,lnfY,0,140,30,'norm',simple?'Cân chỉnh':'LayerNorm',simple?'LayerNorm':'cuối');
+  card('logits',0,logY,0,140,30,'linear',simple?'Chấm điểm từ':'Linear',simple?'Linear':'logits');
+  card('sample',0,smY,0,130,30,'softmax',simple?'Chọn từ':'Softmax',simple?'Softmax':'xác suất');
   // spine (residual highway) segments between consecutive spine anchors
   const spineY=[0,86,geo[0].add1Y,geo[0].add2Y,geo[1].add1Y,geo[1].add2Y,lnfY,logY,smY];
   const spineStep=['embed','embed','b0-add1','b0-add2','b1-add1','b1-add2','lnf','logits','sample'];
@@ -423,7 +458,10 @@ function buildDetail(id){const D=$('detail'),rl=tok(),interp=!!W.interp;const bm
       const tabs=`<div class="tabs" id="htabs">`+Array.from({length:CFG.H},(_,hh)=>`<button class="tab" aria-selected="${hh===curHead}" data-h="${hh}" style="border-color:${css(HROLE[hh])};${hh===curHead?`background:${css(HROLE[hh])}`:''}">${interp?HEAD_ROLES[hh]:'Head '+(hh+1)}</button>`).join('')+`</div>`;
       const hd=L.heads[curHead];const wrap=document.createElement('div');
       const colW=rl.map((w,i)=>(w.length>5?w.slice(0,4)+'…':w));
-      wrap.innerHTML=`<div class="d-sec">Trọng số chú ý A — head đang chọn</div>${tabs}<div class="heatscroll">${heatHTML(hd.A,{diverging:false,text:true,cell:rec.T>7?30:34,rowLabels:rl,colLabels:colW})}</div><div class="legend"><span class="bar seqbar"></span> 0 → 1 · mỗi hàng tổng = 1 · hàng = từ hỏi, cột = từ được nhìn (trái→phải theo thứ tự câu)</div>`;
+      wrap.innerHTML=`<div class="d-sec">Ai nhìn ai? — head đang chọn</div>${tabs}
+        <div class="d-mean" style="font-size:13.5px;margin:2px 0 8px">Mỗi <b>từ bên trái</b> (đang hỏi) nối tới <b>từ bên phải</b> mà nó chú ý — cung càng đậm = chú ý càng nhiều. <span class="cm">Q = câu hỏi mỗi từ đặt ra · K = "nhãn" để so khớp · V = nội dung được lấy về.</span></div>
+        ${attnArcs(hd.A,rl,css(HROLE[curHead]))}
+        <div class="d-sec">Cùng dữ liệu, dạng bảng số (ma trận A)</div><div class="heatscroll">${heatHTML(hd.A,{diverging:false,text:true,cell:rec.T>7?30:34,rowLabels:rl,colLabels:colW})}</div><div class="legend"><span class="bar seqbar"></span> 0 → 1 · mỗi hàng tổng = 1 · hàng = từ hỏi, cột = từ được nhìn</div>`;
       D.appendChild(wrap);D.querySelectorAll('#htabs .tab').forEach(t=>t.onclick=()=>{curHead=+t.dataset.h;buildDetail(id);});return;}
     if(op==='add1'||op==='add2'){const M=op==='add1'?L.hMid:L.hOut;const src=op==='add1'?'Attention':'MLP';D.innerHTML=detailShell({stage:`Block ${bi+1}`,title:'Cộng residual (skip)',crumb,
       mean:`Điểm hợp nhất ⊕ trên "băng chuyền": kết quả ${src} được <b>cộng thẳng</b> vào residual đi qua (đường thẳng dọc trong 3D). Chỉ thêm, không xoá — nhờ đó thông tin cũ được giữ và gradient chảy tốt.`,
@@ -487,6 +525,60 @@ $('next').onclick=()=>{stopRun();spotlight=true;stepTo((runIdx<0?-1:runIdx)+1,fa
 $('prev').onclick=()=>{stopRun();spotlight=true;stepTo((runIdx<=0?1:runIdx)-1,false);};
 $('reset').onclick=()=>{stopRun();runIdx=-1;renderScene();select('token');};
 
+/* ================= ATTENTION ARCS (detail) ================= */
+function attnArcs(A,rl,hcol){const T=A.length;const rowH=Math.max(19,Math.min(30,190/T)),padY=15,leftX=94,rightX=300,Wv=360,Hv=T*rowH+padY*2;
+  const yy=i=>padY+8+i*rowH+rowH/2;let s=`<svg class="arcsvg" viewBox="0 0 ${Wv} ${Hv}" role="img">`;
+  s+=`<text x="${leftX}" y="11" text-anchor="end" class="archint">từ đang hỏi</text><text x="${rightX}" y="11" text-anchor="start" class="archint">nhìn về từ</text>`;
+  for(let i=0;i<T;i++)for(let j=0;j<=i;j++){const w=A[i][j];if(w<0.06)continue;const y1=yy(i),y2=yy(j),mx=(leftX+rightX)/2+30;
+    s+=`<path d="M ${leftX} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${rightX} ${y2}" fill="none" stroke="${hcol}" stroke-width="${(0.6+w*5).toFixed(2)}" stroke-linecap="round" opacity="${(0.14+0.8*w).toFixed(2)}"/>`;}
+  for(let i=0;i<T;i++){const y=yy(i);
+    s+=`<circle cx="${leftX}" cy="${y}" r="3" fill="${css('--accent')}"/><text x="${leftX+7}" y="${y+4}" text-anchor="start" class="arctok" fill="${css('--ink')}">${rl[i]}</text>`;
+    s+=`<circle cx="${rightX}" cy="${y}" r="2.5" fill="${css('--muted')}"/><text x="${rightX-7}" y="${y+4}" text-anchor="end" class="arctok" fill="${css('--ink-2')}">${rl[i]}</text>`;}
+  return `<div class="arcwrap">${s}</svg></div>`;}
+
+/* ================= GUIDED TOUR ================= */
+const TOUR=[
+ {node:null,title:'Toàn cảnh',text:'Đây là một mô hình ngôn ngữ tí hon. Nhiệm vụ: đoán TỪ TIẾP THEO của câu. Nó đọc từ DƯỚI (câu vào) lên TRÊN (từ đoán). Ta đi từng bước nhé.',yaw:-0.62,pitch:0.34,zoom:1},
+ {node:'token',title:'1 · Cắt thành từ',text:'Máy không đọc chữ. Câu được cắt thành từ, mỗi từ đổi thành một con số (ID).',zoom:2.7},
+ {node:'embed',title:'2 · Biến từ thành số có ý nghĩa',text:'Mỗi ID → một vector (toạ độ ý nghĩa), cộng thêm thông tin vị trí. Đây là điểm xuất phát của “băng chuyền” chạy dọc tháp.',zoom:2.7},
+ {node:'b0-attn',title:'3 · Attention — các từ nhìn nhau',text:'Trái tim của transformer. Mỗi từ nhìn lại các từ trước và lấy thông tin cần. Có 3 “chuyên gia” (head) chạy SONG SONG — 3 tấm tách theo chiều sâu ở đây.',yaw:-1.02,pitch:0.18,zoom:2.4},
+ {node:'b0-add1',title:'4 · Cộng vào băng chuyền',text:'Kết quả attention được CỘNG thẳng vào băng chuyền — chỉ thêm, không xoá (gọi là residual).',zoom:2.8},
+ {node:'b0-mlp',title:'5 · Mỗi từ tự suy nghĩ thêm',text:'Sau khi trao đổi thông tin, mỗi từ tự xử lý một mình qua một mạng nhỏ (MLP) — nơi chứa phần lớn “kiến thức”.',zoom:2.7},
+ {node:'b1-attn',title:'6 · Lặp lại nhiều tầng',text:'Toàn bộ khối trên lặp lại (ở đây 2 tầng; GPT thật có hàng chục) để hiểu ngày càng sâu.',yaw:-1.02,pitch:0.18,zoom:2.1},
+ {node:'lnf',title:'7 · Cân chỉnh cuối',text:'Một bước chuẩn hoá cuối cùng trước khi ra quyết định.',zoom:2.8},
+ {node:'logits',title:'8 · Chấm điểm mọi từ',text:'So khớp với TỪNG từ trong từ điển: từ nào hợp làm từ tiếp theo? Mỗi từ được một điểm số.',zoom:2.7},
+ {node:'sample',title:'9 · Chọn ra từ',text:'Đổi điểm thành phần trăm (softmax) rồi chọn một từ — đó là từ mô hình đoán! Nối vào câu và lặp lại để sinh tiếp.',zoom:2.7},
+ {node:null,title:'Xong! Giờ tự khám phá',text:'Kéo để xoay, cuộn để zoom, BẤM vào bất kỳ khối nào để xem phép toán & số thật. Bật “🧑‍🏫 Dễ hiểu” để đổi nhãn, hay “▶ Chạy” để xem đèn chạy qua từng bước.',yaw:-0.62,pitch:0.34,zoom:1},
+];
+function focusPan(nodeId,y2,p2,z2){const cy=Math.cos(y2),sy=Math.sin(y2),cp=Math.cos(p2),sp=Math.sin(p2);
+  const pr=p=>{const x1=p[0]*cy+p[2]*sy,z1=-p[0]*sy+p[2]*cy,yv=p[1]*cp-z1*sp;return{x:x1,y:-yv};};
+  let mnx=1e9,mny=1e9,mxx=-1e9,mxy=-1e9;const acc=p=>{const q=pr(p);if(q.x<mnx)mnx=q.x;if(q.x>mxx)mxx=q.x;if(q.y<mny)mny=q.y;if(q.y>mxy)mxy=q.y;};
+  for(const c of SCENE.cards){const hw=c.w/2,hh=c.h/2;acc([c.x-hw,c.y-hh,c.z]);acc([c.x+hw,c.y-hh,c.z]);acc([c.x-hw,c.y+hh,c.z]);acc([c.x+hw,c.y+hh,c.z]);}
+  for(const l of SCENE.links){acc(l.a);acc(l.b);}
+  const bcx=(mnx+mxx)/2,bcy=(mny+mxy)/2;const nd=SCENE.cards.find(c=>c.id===nodeId)||{x:0,y:0,z:0};const q=pr([nd.x,nd.y,nd.z]);
+  return{panX:q.x-bcx,panY:q.y-bcy};}
+function animatePose(y2,p2,z2,px2,py2){const y0=yaw,p0=pitch,z0=zoom,x0=panX,pY0=panY,t0=performance.now(),dur=matchMedia('(prefers-reduced-motion:reduce)').matches?0:720;
+  if(poseAnim)cancelAnimationFrame(poseAnim);const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  (function fr(now){const t=dur?Math.min(1,(now-t0)/dur):1,e=ease(t);yaw=y0+(y2-y0)*e;pitch=p0+(p2-p0)*e;zoom=z0+(z2-z0)*e;panX=x0+(px2-x0)*e;panY=pY0+(py2-py0)*e;renderScene();if(t<1)poseAnim=requestAnimationFrame(fr);else poseAnim=null;})(performance.now());}
+function tourGoto(k){k=Math.max(0,Math.min(TOUR.length-1,k));tourStep=k;const s=TOUR[k];
+  const y2=s.yaw!=null?s.yaw:yaw,p2=s.pitch!=null?s.pitch:pitch,z2=s.zoom!=null?s.zoom:2.4;
+  let tpx=0,tpy=0;if(s.node){const f=focusPan(s.node,y2,p2,z2);tpx=f.panX;tpy=f.panY;}
+  animatePose(y2,p2,z2,tpx,tpy);
+  if(s.node){spotlight=true;runIdx=FLOW.indexOf(s.node);selId=s.node;buildDetail(s.node);}else{spotlight=false;runIdx=-1;}
+  applyStates();
+  $('tstep').textContent='Bước '+(k+1)+' / '+TOUR.length;$('ttitle').textContent=s.title;$('ttext').textContent=s.text;
+  $('tdots').innerHTML=TOUR.map((_,i)=>`<span class="d ${i===k?'on':''}"></span>`).join('');
+  $('tprev').disabled=k===0;$('tnext').textContent=k===TOUR.length-1?'Xong ✓':'Tiếp ›';}
+function tourStart(){stopRun();$('introveil').classList.add('hidden');$('tourcard').classList.add('on');tourGoto(0);}
+function tourEnd(){$('tourcard').classList.remove('on');spotlight=false;runIdx=-1;tourStep=-1;applyStates();}
+$('tourbtn').onclick=tourStart;
+$('introTour').onclick=tourStart;
+$('introSkip').onclick=()=>$('introveil').classList.add('hidden');
+$('tnext').onclick=()=>{if(tourStep>=TOUR.length-1)tourEnd();else tourGoto(tourStep+1);};
+$('tprev').onclick=()=>tourGoto(tourStep-1);
+$('texit').onclick=tourEnd;
+$('simpleseg').querySelectorAll('button').forEach(b=>b.onclick=()=>{simple=b.dataset.s==='1';$('simpleseg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));build3D();renderScene();});
+
 /* ================= CONTROLS ================= */
 const EXAMPLES=["the cat sat on the mat","she saw the big red bird","a dog ran to the park"];
 $('examples').innerHTML=EXAMPLES.map(s=>`<button class="chip" data-s="${s}">${s}</button>`).join('');
@@ -498,6 +590,7 @@ new MutationObserver(()=>{refreshPal();renderScene();buildDetail(selId);}).obser
 addEventListener('resize',scheduleRender);
 
 $('ptotal').innerHTML='Toy model này ≈ <b>'+TOTP.toLocaleString('en-US')+'</b> tham số. Cùng kiến trúc ở GPT-2 nhỏ ≈ <b>124M</b>, GPT-3 ≈ <b>175B</b>. Vì sao lớn? Mỗi lớp tốn ~<b>12·d²</b> tham số — cả <b>d</b> (chiều ẩn) lẫn <b>số lớp</b> đều tăng nên bùng nổ. Bấm từng khối để xem chi tiết.';
+$('purpose').innerHTML='🎯 <b>Mục tiêu: đoán từ tiếp theo.</b> Đọc tháp từ <b>dưới lên</b>. <span class="warn">Model đồ chơi chưa train → xem *cách chạy*, không phải chất lượng.</span> Mới bắt đầu? Bấm <b>🎓 Học nhanh</b>.';
 rec=forward(tokenize($('input').value),W);build3D();renderScene();select('embed');
 </script>
 
