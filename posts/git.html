@@ -28,7 +28,8 @@
   .status b{color:var(--accent)}
   .pg-top .sp{margin-left:auto;display:flex;gap:8px}
   /* nút .btn — dùng từ style.css chung */
-  .graphscroll{overflow:auto;max-height:340px;background:repeating-linear-gradient(90deg,transparent,transparent 77px,color-mix(in srgb,var(--line) 40%,transparent) 77px,color-mix(in srgb,var(--line) 40%,transparent) 78px)}
+  .graphscroll{overflow:auto;max-height:380px;cursor:grab;background:repeating-linear-gradient(90deg,transparent,transparent 77px,color-mix(in srgb,var(--line) 40%,transparent) 77px,color-mix(in srgb,var(--line) 40%,transparent) 78px)}
+  .graphscroll.grabbing{cursor:grabbing}
   #graph{display:block}
   .gedge{stroke:var(--muted);stroke-width:2;fill:none;opacity:.6}
   .gedge.m2{stroke:var(--gold)}
@@ -197,7 +198,7 @@
       <button class="btn" id="freeplay">Tự chơi tự do →</button>
     </div></div>
   </div>
-  <p style="font-size:12.5px;color:var(--muted);margin:2px 2px 0">Kéo ngang để xem đồ thị dài · bấm một commit để <code style="font-family:var(--mono)">checkout</code>.</p>
+  <p style="font-size:12.5px;color:var(--muted);margin:2px 2px 0">🖐️ Kéo (giữ chuột) để di chuyển đồ thị · bấm một commit để <code style="font-family:var(--mono)">checkout</code>.</p>
 
   <div class="concepts">
     <h2><span class="n">00</span>Git là gì, và vì sao</h2>
@@ -303,11 +304,12 @@ function act(fn,...a){const r=fn(st,...a);if(r&&r.cmd!==undefined||r&&r.msg){log
 
 function genOf(s){const g={};const vis=id=>{if(id==null)return -1;if(g[id]!=null)return g[id];const c=s.commits[id];if(!c)return -1;let m=-1;c.parents.forEach(p=>m=Math.max(m,vis(p)));return g[id]=m+1;};s.order.forEach(vis);return g;}
 function refsAt(s){const m={};const add=(id,ref,kind)=>{if(id==null)return;(m[id]=m[id]||[]).push({ref,kind});};Object.entries(s.branches).forEach(([n,id])=>add(id,n,'branch'));Object.entries(s.remote).forEach(([n,id])=>add(id,n,'remote'));if(s.head.type==='detached')add(s.head.ref,'HEAD','head');return m;}
-function renderGraph(){const s=st;const COL=78,LANE=64,R=16,PADX=40,PADY=34;const g=genOf(s);const ids=s.order.filter(id=>s.commits[id]);
-  let maxG=0,maxL=0;ids.forEach(id=>{maxG=Math.max(maxG,g[id]);maxL=Math.max(maxL,s.commits[id].lane);});
+function renderGraph(){const s=st;const COL=78,LANE=64,R=16,PADX=44;const g=genOf(s);const ids=s.order.filter(id=>s.commits[id]);
+  const hc=headCommit(s), refs=refsAt(s);
+  let maxG=0,maxL=0,maxRefs=0;ids.forEach(id=>{maxG=Math.max(maxG,g[id]);maxL=Math.max(maxL,s.commits[id].lane);maxRefs=Math.max(maxRefs,(refs[id]||[]).length);});
+  const PADY=Math.max(46,30+maxRefs*22);
   const W=Math.max(200,PADX*2+ (maxG+1)*COL + 120), H=Math.max(150,PADY*2+(maxL+1)*LANE);
   const X=id=>PADX+g[id]*COL, Y=id=>PADY+s.commits[id].lane*LANE;
-  const hc=headCommit(s), refs=refsAt(s);
   let e='',n='';
   ids.forEach(id=>{const c=s.commits[id];c.parents.forEach(p=>{if(!s.commits[p])return;const x1=X(p),y1=Y(p),x2=X(id),y2=Y(id),mx=(x1+x2)/2;const cls=(c.parents.length>1&&p===c.parents[1])?'gedge m2':'gedge';e+=`<path class="${cls}" d="M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}"/>`;});});
   ids.forEach(id=>{const c=s.commits[id];const x=X(id),y=Y(id);const cls=['gnode'];if(id===hc)cls.push('head');if(c.parents.length>1)cls.push('merge');if(c.onRemote)cls.push('remote');if(id===newest)cls.push('newest');if(id===selCommit)cls.push('sel');
@@ -352,6 +354,11 @@ $('bHard').onclick=()=>{if(confirm('reset --hard sẽ XOÁ thay đổi chưa com
 $('bRevert').onclick=()=>run(doRevert);
 $('bPush').onclick=()=>run(doPush);$('bPull').onclick=()=>run(doPull);$('bFetch').onclick=()=>run(doFetch);$('bColleague').onclick=()=>run(colleaguePush);
 $('resetRepo').onclick=()=>{st=newRepo();logLines=[];newest=null;selCommit=null;render();};
+/* kéo để pan khu đồ thị (chuột) */
+(function(){const gs=$('graphscroll');let drag=false,sx,sy,sl,stp;
+  gs.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;if(e.target.closest&&e.target.closest('.gnode'))return;drag=true;sx=e.clientX;sy=e.clientY;sl=gs.scrollLeft;stp=gs.scrollTop;gs.classList.add('grabbing');});
+  window.addEventListener('pointermove',e=>{if(!drag)return;gs.scrollLeft=sl-(e.clientX-sx);gs.scrollTop=stp-(e.clientY-sy);});
+  window.addEventListener('pointerup',()=>{if(drag){drag=false;gs.classList.remove('grabbing');}});})();
 
 /* ============ THEME ============ */
 $('yr').textContent=new Date().getFullYear();
