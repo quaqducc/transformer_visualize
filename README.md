@@ -11,11 +11,14 @@
 ```
 index.html                 ← Trang chủ blog: hero + bài nổi bật + danh sách bài (lọc theo chủ đề)
 about.html                 ← Giới thiệu
+style.css                  ← Khung dùng chung: tokens (đỏ–đen) + base + header/footer/nút
 posts/
-  transformer.html         ← Bài: "Bên trong một Transformer" (tháp 3D GPT, tương tác)
+  transformer.html         ← Bài: "Bên trong một Transformer" (tháp 3D GPT) — self-contained
+  git.html                 ← Bài: "Git: nhánh & dòng thời gian" (đồ thị commit tương tác)
 README.md  ·  .gitignore
 ```
 
+- **`style.css` dùng chung**: design tokens (đỏ–đen, sáng/tối) + header/footer/nút. Đổi màu thương hiệu chỉ cần sửa một nơi. Trang chủ, Giới thiệu và bài Git link tới nó; bài **Transformer để self-contained** (có bảng màu riêng đã tinh chỉnh, sinh tự động — mỗi bài tương tác là một file portable).
 - Header/footer & bộ màu giống nhau trên mọi trang; nút 🌙/☀️ đổi sáng/tối (lưu bằng `localStorage`).
 - Trang chủ có **lọc theo chủ đề** (AI/ML · Cơ bản · Thuật toán · Hệ thống · Web) bằng JS thuần.
 

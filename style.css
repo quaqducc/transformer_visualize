@@ -1,0 +1,65 @@
+/* Giải Mã — khung dùng chung: design tokens (đỏ–đen) + base + header/footer/nút.
+   Trang riêng chỉ cần link file này rồi thêm CSS đặc thù của mình. */
+
+:root{ /* ĐỎ–ĐEN (mặc định, dark-first) */
+  color-scheme:dark;
+  --bg:#0c0b0e;--surface:#161419;--surface-2:#201d24;--raise:#26222b;
+  --ink:#f4f2f6;--ink-2:#b4afba;--muted:#7e7a86;
+  --line:#2a2730;--line-2:#211e26;
+  --accent:#ff3b47;--accent-2:#d21f2c;--accent-ink:#ffffff;--accent-soft:#2a1418;
+  --good:#2fce6a;--gold:#f5a623;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 50px -22px rgba(0,0,0,.8);
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Code","JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --bg:#f6f5f7;--surface:#ffffff;--surface-2:#f1eff2;--raise:#ffffff;
+  --ink:#17151b;--ink-2:#4c4954;--muted:#87838f;--line:#e7e3ea;--line-2:#efecf1;
+  --accent:#d81f2c;--accent-2:#ad1622;--accent-ink:#ffffff;--accent-soft:#fdecee;
+  --shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f6f5f7;--surface:#ffffff;--surface-2:#f1eff2;--raise:#ffffff;
+  --ink:#17151b;--ink-2:#4c4954;--muted:#87838f;--line:#e7e3ea;--line-2:#efecf1;
+  --accent:#d81f2c;--accent-2:#ad1622;--accent-ink:#ffffff;--accent-soft:#fdecee;
+  --shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+/* ---- header ---- */
+header.site{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(10px) saturate(1.3);border-bottom:1px solid var(--line)}
+.site-in{max-width:1080px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:13px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo svg{width:28px;height:28px;flex:0 0 auto;border-radius:8px}
+.logo .wm{font-weight:800;letter-spacing:-.01em;font-size:17px}
+.logo .wm b{color:var(--accent)}
+.homelink{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:7px 11px;white-space:nowrap}
+.homelink:hover{border-color:var(--accent);color:var(--ink)}
+nav{margin-left:auto;display:flex;align-items:center;gap:6px}
+.nav-link{font-size:14px;font-weight:600;color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:9px}
+.nav-link:hover{color:var(--ink);background:var(--surface-2)}
+@media(max-width:600px){.nav-link{display:none}}
+.iconbtn{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;cursor:pointer;font-size:16px}
+.iconbtn:hover{border-color:var(--accent)}
+
+/* ---- nút chung ---- */
+.btn{font-family:var(--sans);font-size:14px;font-weight:650;text-decoration:none;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 15px;display:inline-flex;align-items:center;gap:7px;transition:transform .12s,border-color .2s,background .2s}
+.btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent-2)}
+.btn.ghost{background:transparent}
+
+/* ---- footer ---- */
+footer{border-top:1px solid var(--line);margin-top:34px;padding:26px 0 60px;color:var(--muted);font-size:13.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+footer a{color:var(--ink-2);text-decoration:none}
+footer a:hover{color:var(--accent)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}

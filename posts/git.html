@@ -8,34 +8,13 @@
 <title>Git: nhánh & dòng thời gian, nhìn là hiểu — Giải Mã</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111114'/%3E%3Crect x='8' y='9' width='16' height='4' rx='2' fill='%23ff3b47'/%3E%3Crect x='8' y='15' width='13' height='4' rx='2' fill='%23e8e6ea'/%3E%3Crect x='8' y='21' width='10' height='4' rx='2' fill='%238a8790'/%3E%3C/svg%3E">
 <script>try{var t=localStorage.getItem('giaima-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<link rel="stylesheet" href="../style.css">
 <style>
-  :root{color-scheme:dark;
-    --bg:#0c0b0e;--surface:#161419;--surface-2:#201d24;--raise:#26222b;
-    --ink:#f4f2f6;--ink-2:#b4afba;--muted:#7e7a86;--line:#2a2730;
-    --accent:#ff3b47;--accent-2:#d21f2c;--accent-ink:#fff;--accent-soft:#2a1418;
-    --good:#37d07a;--gold:#f5a623;--cyan:#22c1c3;--violet:#a97bff;
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 50px -22px rgba(0,0,0,.8);
-    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --mono:ui-monospace,"Cascadia Code","JetBrains Mono","SF Mono",Menlo,Consolas,monospace;}
-  @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;
-    --bg:#f6f5f7;--surface:#fff;--surface-2:#f1eff2;--raise:#fff;--ink:#17151b;--ink-2:#4c4954;--muted:#87838f;--line:#e7e3ea;
-    --accent:#d81f2c;--accent-2:#ad1622;--accent-soft:#fdecee;--shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);}}
-  :root[data-theme="light"]{color-scheme:light;
-    --bg:#f6f5f7;--surface:#fff;--surface-2:#f1eff2;--raise:#fff;--ink:#17151b;--ink-2:#4c4954;--muted:#87838f;--line:#e7e3ea;
-    --accent:#d81f2c;--accent-2:#ad1622;--accent-soft:#fdecee;--shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
-  a{color:inherit}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-  /* header */
-  header.site{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(10px) saturate(1.3);border-bottom:1px solid var(--line)}
-  .site-in{max-width:1080px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:12px}
-  .homelink{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:7px 11px;white-space:nowrap}
-  .homelink:hover{border-color:var(--accent);color:var(--ink)}
-  .logo{display:flex;align-items:center;gap:9px;text-decoration:none}
-  .logo svg{width:26px;height:26px;border-radius:7px}.logo .wm{font-weight:800;font-size:16px}.logo .wm b{color:var(--accent)}
-  .iconbtn{margin-left:auto;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;cursor:pointer;font-size:15px}
-  .iconbtn:hover{border-color:var(--accent)}
+  /* tokens riêng cho bài này (bổ sung cho style.css chung) */
+  :root{--raise:#26222b;--cyan:#22c1c3;--violet:#a97bff}
+  @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--raise:#ffffff}}
+  :root[data-theme="light"]{--raise:#ffffff}
+  .iconbtn{margin-left:auto}
   /* article */
   .post-head{padding:40px 0 8px}
   .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700}
@@ -48,11 +27,7 @@
   .status{font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
   .status b{color:var(--accent)}
   .pg-top .sp{margin-left:auto;display:flex;gap:8px}
-  .btn{font-family:var(--sans);font-size:13px;font-weight:650;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:8px 12px;display:inline-flex;gap:6px;align-items:center}
-  .btn:hover{border-color:var(--accent)}
-  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-  .btn.primary:hover{background:var(--accent-2)}
-  .btn.ghost{background:transparent}
+  /* nút .btn — dùng từ style.css chung */
   .graphscroll{overflow:auto;max-height:340px;background:repeating-linear-gradient(90deg,transparent,transparent 77px,color-mix(in srgb,var(--line) 40%,transparent) 77px,color-mix(in srgb,var(--line) 40%,transparent) 78px)}
   #graph{display:block}
   .gedge{stroke:var(--muted);stroke-width:2;fill:none;opacity:.6}
@@ -128,9 +103,7 @@
   .cg .row:first-of-type{border-top:0}
   .cg code{font-family:var(--mono);font-size:12px;color:var(--ink)}
   .cg .row span{color:var(--muted);text-align:right}
-  footer{border-top:1px solid var(--line);margin-top:40px;padding:24px 0 60px;color:var(--muted);font-size:13.5px}
-  footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
-  footer a{color:var(--ink-2);text-decoration:none}footer a:hover{color:var(--accent)}
+  /* footer — dùng từ style.css chung */
   @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
