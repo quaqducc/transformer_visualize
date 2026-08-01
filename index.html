@@ -3,124 +3,155 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<meta name="description" content="AI Trực Quan — học cách các mô hình AI hoạt động bằng những bài học tương tác, chạy thật trong trình duyệt.">
-<title>AI Trực Quan — Học AI bằng cách nhìn thấy nó</title>
+<meta name="description" content="Giải Mã — blog kiến thức Công nghệ thông tin, giải thích bằng hình ảnh trực quan, dễ hiểu.">
+<meta name="color-scheme" content="dark light">
+<title>Giải Mã — Kiến thức CNTT, giải thích bằng hình</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111114'/%3E%3Crect x='8' y='9' width='16' height='4' rx='2' fill='%23ff3b47'/%3E%3Crect x='8' y='15' width='13' height='4' rx='2' fill='%23e8e6ea'/%3E%3Crect x='8' y='21' width='10' height='4' rx='2' fill='%238a8790'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('giaima-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
 <style>
-  :root{
-    color-scheme:light;
-    --bg:#eef1f5;--surface:#ffffff;--surface-2:#f5f8fb;
-    --ink:#141922;--ink-2:#48505f;--muted:#7c8593;
-    --line:#e3e8ef;--accent:#2a6fd6;--accent-2:#1c5cab;--accent-ink:#fff;--accent-soft:#e7f0fc;
-    --good:#0ca30c;--gold:#c98500;
-    --shadow:0 1px 2px rgba(16,22,34,.04),0 14px 40px -18px rgba(16,22,34,.22);
+  :root{ /* ĐỎ–ĐEN (mặc định, dark-first) */
+    color-scheme:dark;
+    --bg:#0c0b0e;--surface:#161419;--surface-2:#201d24;--raise:#26222b;
+    --ink:#f4f2f6;--ink-2:#b4afba;--muted:#7e7a86;
+    --line:#2a2730;--line-2:#211e26;
+    --accent:#ff3b47;--accent-2:#d21f2c;--accent-ink:#ffffff;--accent-soft:#2a1418;
+    --good:#2fce6a;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 50px -22px rgba(0,0,0,.8);
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     --mono:ui-monospace,"Cascadia Code","JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
   }
-  @media (prefers-color-scheme:dark){:root{
-    color-scheme:dark;--bg:#0b0e13;--surface:#141922;--surface-2:#10151c;
-    --ink:#e9edf3;--ink-2:#a6b0be;--muted:#6e7784;--line:#242c37;
-    --accent:#4a92ee;--accent-2:#6aa8f0;--accent-ink:#0b0e13;--accent-soft:#16273c;
-    --good:#2fce6a;--gold:#e0a53a;
-    --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 46px -20px rgba(0,0,0,.75);
+  @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+    color-scheme:light;
+    --bg:#f6f5f7;--surface:#ffffff;--surface-2:#f1eff2;--raise:#ffffff;
+    --ink:#17151b;--ink-2:#4c4954;--muted:#87838f;
+    --line:#e7e3ea;--line-2:#efecf1;
+    --accent:#d81f2c;--accent-2:#ad1622;--accent-ink:#ffffff;--accent-soft:#fdecee;
+    --shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);
   }}
+  :root[data-theme="light"]{
+    color-scheme:light;
+    --bg:#f6f5f7;--surface:#ffffff;--surface-2:#f1eff2;--raise:#ffffff;
+    --ink:#17151b;--ink-2:#4c4954;--muted:#87838f;
+    --line:#e7e3ea;--line-2:#efecf1;
+    --accent:#d81f2c;--accent-2:#ad1622;--accent-ink:#ffffff;--accent-soft:#fdecee;
+    --shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);
+  }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
   a{color:inherit}
   .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
 
-  header.site{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(10px) saturate(1.3);border-bottom:1px solid var(--line)}
-  .site-in{max-width:1080px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;gap:16px}
-  .logo{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.01em;font-size:17px;text-decoration:none}
-  .logo .mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;font-size:15px}
-  nav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  /* header */
+  header.site{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(10px) saturate(1.3);border-bottom:1px solid var(--line)}
+  .site-in{max-width:1080px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo svg{width:30px;height:30px;flex:0 0 auto;border-radius:8px}
+  .logo .wm{font-weight:800;letter-spacing:-.01em;font-size:18px}
+  .logo .wm b{color:var(--accent)}
+  nav{margin-left:auto;display:flex;align-items:center;gap:6px}
   .nav-link{font-size:14px;font-weight:600;color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:9px}
   .nav-link:hover{color:var(--ink);background:var(--surface-2)}
-  @media(max-width:560px){.nav-link{display:none}}
+  @media(max-width:600px){.nav-link{display:none}}
+  .iconbtn{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;cursor:pointer;font-size:16px}
+  .iconbtn:hover{border-color:var(--accent)}
   .btn{font-family:var(--sans);font-size:14px;font-weight:650;text-decoration:none;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 15px;display:inline-flex;align-items:center;gap:7px;transition:transform .12s,border-color .2s,background .2s}
   .btn:hover{border-color:var(--accent);transform:translateY(-1px)}
   .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
   .btn.primary:hover{background:var(--accent-2)}
 
-  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:32px;align-items:center;padding:64px 0 40px}
-  @media(max-width:820px){.hero{grid-template-columns:1fr;padding:44px 0 24px}.hero-art{order:-1;margin:0 auto}}
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:center;padding:60px 0 34px}
+  @media(max-width:820px){.hero{grid-template-columns:1fr;padding:40px 0 20px}.hero-art{order:-1;margin:0 auto}}
   .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:700}
-  h1{font-size:clamp(32px,5.4vw,52px);line-height:1.05;letter-spacing:-.025em;font-weight:850;margin:.32em 0 .34em;text-wrap:balance;max-width:15ch}
+  h1{font-size:clamp(33px,5.6vw,54px);line-height:1.03;letter-spacing:-.025em;font-weight:850;margin:.3em 0 .32em;text-wrap:balance;max-width:16ch}
+  h1 .hl{color:var(--accent)}
   .lede{font-size:19px;color:var(--ink-2);max-width:52ch;margin:0 0 26px}
   .lede b{color:var(--ink);font-weight:650}
   .cta{display:flex;gap:12px;flex-wrap:wrap}
   .cta .btn{padding:12px 20px;font-size:15px}
-  .stat{display:flex;gap:26px;margin-top:30px;flex-wrap:wrap}
-  .stat .s{font-family:var(--mono)}
-  .stat .n{font-size:22px;font-weight:800;color:var(--ink)}
-  .stat .l{font-size:12.5px;color:var(--muted)}
 
-  .hero-art{width:min(340px,78vw);aspect-ratio:1;display:grid;place-items:center;perspective:1000px}
-  .stack{position:relative;width:150px;height:150px;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(-40deg);animation:spin 22s linear infinite}
+  .hero-art{width:min(330px,76vw);aspect-ratio:1;display:grid;place-items:center;perspective:1000px}
+  .stack{position:relative;width:150px;height:150px;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(-40deg);animation:spin 24s linear infinite}
   @keyframes spin{to{transform:rotateX(58deg) rotateZ(320deg)}}
-  .pl{position:absolute;inset:0;border-radius:20px;border:1.5px solid var(--accent);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 24%,transparent),color-mix(in srgb,var(--accent) 5%,transparent));box-shadow:0 0 34px -12px var(--accent)}
-  .pl:nth-child(1){transform:translateZ(-56px)}.pl:nth-child(2){transform:translateZ(-28px)}
-  .pl:nth-child(3){transform:translateZ(0)}.pl:nth-child(4){transform:translateZ(28px)}
-  .pl:nth-child(5){transform:translateZ(56px);border-color:var(--accent-2)}
+  .pl{position:absolute;inset:0;border-radius:20px;border:1.5px solid var(--accent);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 26%,transparent),color-mix(in srgb,var(--accent) 5%,transparent));box-shadow:0 0 40px -12px var(--accent)}
+  .pl:nth-child(1){transform:translateZ(-58px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+  .pl:nth-child(2){transform:translateZ(-29px)}
+  .pl:nth-child(3){transform:translateZ(0)}
+  .pl:nth-child(4){transform:translateZ(29px)}
+  .pl:nth-child(5){transform:translateZ(58px)}
   @media (prefers-reduced-motion:reduce){.stack{animation:none}}
 
-  section{padding:34px 0}
-  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap}
-  .sec-head h2{font-size:26px;font-weight:800;letter-spacing:-.01em;margin:0}
+  /* sections */
+  section{padding:30px 0}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+  .sec-head h2{font-size:25px;font-weight:800;letter-spacing:-.01em;margin:0}
   .sec-head .count{font-family:var(--mono);font-size:13px;color:var(--muted)}
-  .sec-sub{color:var(--ink-2);font-size:15.5px;margin:0 0 22px;max-width:64ch}
 
-  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-  .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);padding:20px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:10px;min-height:200px;transition:transform .14s,border-color .2s,box-shadow .2s}
-  a.card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 1px 2px rgba(16,22,34,.05),0 20px 50px -22px color-mix(in srgb,var(--accent) 50%,transparent)}
-  .card.soon{opacity:.72}
-  .card .ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:24px;background:var(--surface-2);border:1px solid var(--line)}
-  .card h3{margin:2px 0 0;font-size:18px;font-weight:750;letter-spacing:-.01em}
-  .card p{margin:0;font-size:14px;color:var(--ink-2);flex:1}
-  .badge{position:absolute;top:16px;right:16px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
-  .badge.ok{background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good);border:1px solid color-mix(in srgb,var(--good) 40%,transparent)}
+  /* featured */
+  .feat{display:grid;grid-template-columns:1.1fr .9fr;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);text-decoration:none;color:inherit;transition:border-color .2s,transform .14s}
+  .feat:hover{border-color:var(--accent);transform:translateY(-2px)}
+  @media(max-width:720px){.feat{grid-template-columns:1fr}}
+  .feat .body{padding:26px 28px}
+  .feat .kicker{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  .feat h3{font-size:26px;font-weight:800;letter-spacing:-.015em;margin:8px 0 8px;line-height:1.1}
+  .feat p{margin:0 0 16px;color:var(--ink-2);font-size:15px}
+  .feat .go{font-family:var(--mono);font-weight:700;color:var(--accent);font-size:14px}
+  .feat .art{background:radial-gradient(120% 90% at 70% 20%,var(--accent-soft),transparent),linear-gradient(160deg,#000,#1a0d10);display:grid;place-items:center;min-height:210px;position:relative;overflow:hidden}
+  .feat .art .mini{width:132px;height:132px;perspective:800px}
+  .feat .art .mini .stack{width:120px;height:120px;animation-duration:30s}
+
+  /* filter chips */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .chip{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer;transition:.15s}
+  .chip:hover{color:var(--ink);border-color:var(--accent)}
+  .chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+  /* post cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:16px}
+  .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);padding:19px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:9px;min-height:198px;transition:transform .14s,border-color .2s}
+  a.card:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .card.soon{opacity:.66}
+  .card.hide{display:none}
+  .card .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:23px;background:var(--surface-2);border:1px solid var(--line)}
+  .card h3{margin:2px 0 0;font-size:17.5px;font-weight:750;letter-spacing:-.01em}
+  .card p{margin:0;font-size:13.5px;color:var(--ink-2);flex:1}
+  .card .meta{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .card .cat{color:var(--accent);font-weight:700}
+  .badge{position:absolute;top:15px;right:15px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+  .badge.ok{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 42%,transparent)}
   .badge.soon{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
   .card .go{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);margin-top:auto}
-  .tags{display:flex;gap:6px;flex-wrap:wrap}
-  .tag{font-family:var(--mono);font-size:11px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
 
-  .why{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-  .why .w{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
-  .why .w .k{font-size:22px}
-  .why .w h4{margin:8px 0 5px;font-size:16px;font-weight:750}
-  .why .w p{margin:0;font-size:14px;color:var(--ink-2)}
-
-  footer{border-top:1px solid var(--line);margin-top:30px;padding:26px 0 60px;color:var(--muted);font-size:13.5px}
+  footer{border-top:1px solid var(--line);margin-top:34px;padding:26px 0 60px;color:var(--muted);font-size:13.5px}
   footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
   footer a{color:var(--ink-2);text-decoration:none}footer a:hover{color:var(--accent)}
 </style>
 </head>
 <body>
 <header class="site"><div class="site-in">
-  <a class="logo" href="#top"><span class="mark">◫</span> AI Trực Quan</a>
+  <a class="logo" href="index.html" aria-label="Giải Mã — trang chủ">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#111114"/><rect x="8" y="9" width="16" height="4" rx="2" fill="#ff3b47"/><rect x="8" y="15" width="13" height="4" rx="2" fill="#e8e6ea"/><rect x="8" y="21" width="10" height="4" rx="2" fill="#8a8790"/></svg>
+    <span class="wm">Giải<b>Mã</b></span>
+  </a>
   <nav>
-    <a class="nav-link" href="#lessons">Bài học</a>
+    <a class="nav-link" href="#posts">Bài viết</a>
+    <a class="nav-link" href="about.html">Giới thiệu</a>
     <a class="nav-link" href="https://github.com/quaqducc/transformer_visualize" target="_blank" rel="noopener">GitHub</a>
-    <a class="btn primary" href="lessons/transformer.html">Bắt đầu học</a>
+    <button class="iconbtn" id="themeBtn" title="Đổi giao diện sáng/tối" aria-label="Đổi giao diện">🌙</button>
   </nav>
 </div></header>
 
-<main id="top">
+<main>
   <div class="wrap">
     <section class="hero">
       <div>
-        <div class="eyebrow">Học AI bằng trực giác</div>
-        <h1>Hiểu cách AI hoạt động — bằng cách nhìn thấy nó.</h1>
-        <p class="lede">Những bài học <b>tương tác, chạy thật trong trình duyệt</b>. Không lý thuyết suông: bạn xoay, bấm, và thấy từng con số chảy qua mô hình — từ con chữ đầu vào tới từ được đoán ra.</p>
+        <div class="eyebrow">Kiến thức CNTT · bằng hình</div>
+        <h1>Những thứ khó, <span class="hl">giải mã</span> bằng hình ảnh.</h1>
+        <p class="lede">Blog giải thích kiến thức Công nghệ thông tin theo cách <b>trực quan &amp; dễ hiểu</b> — nhiều bài <b>tương tác chạy thật trong trình duyệt</b>. Bạn không chỉ đọc, bạn <b>nhìn thấy</b> nó hoạt động.</p>
         <div class="cta">
-          <a class="btn primary" href="lessons/transformer.html">🧊 Vào bài: Bên trong Transformer →</a>
-          <a class="btn" href="#lessons">Xem tất cả bài học</a>
-        </div>
-        <div class="stat">
-          <div class="s"><div class="n">1</div><div class="l">bài học sẵn có</div></div>
-          <div class="s"><div class="n">100%</div><div class="l">chạy trong trình duyệt</div></div>
-          <div class="s"><div class="n">0</div><div class="l">cài đặt cần thiết</div></div>
+          <a class="btn primary" href="posts/transformer.html">🧊 Đọc bài đầu tiên →</a>
+          <a class="btn" href="#posts">Tất cả bài viết</a>
         </div>
       </div>
       <div class="hero-art" aria-hidden="true">
@@ -128,62 +159,108 @@
       </div>
     </section>
 
-    <section id="lessons">
-      <div class="sec-head"><h2>Bài học</h2><span class="count">1 sẵn có · 3 sắp ra mắt</span></div>
-      <p class="sec-sub">Mỗi bài là một app tương tác độc lập — học được từ số 0 rồi đào sâu tuỳ ý.</p>
-      <div class="cards">
+    <section>
+      <div class="sec-head"><h2>Bài nổi bật</h2></div>
+      <a class="feat" href="posts/transformer.html">
+        <div class="body">
+          <div class="kicker">AI / Machine Learning · Tương tác</div>
+          <h3>Bên trong một Transformer</h3>
+          <p>Tháp 3D xoay được của một mô hình ngôn ngữ (GPT). Nhập một câu và xem forward pass thật chảy qua embedding → attention (3 head song song) → MLP → đoán từ, kèm số tham số so với GPT-2/GPT-3. Có tour dẫn dắt cho người mới.</p>
+          <span class="go">Đọc bài →</span>
+        </div>
+        <div class="art" aria-hidden="true"><div class="mini"><div class="stack"><span class="pl"></span><span class="pl"></span><span class="pl"></span><span class="pl"></span><span class="pl"></span></div></div></div>
+      </a>
+    </section>
 
-        <a class="card" href="lessons/transformer.html">
+    <section id="posts">
+      <div class="sec-head"><h2>Tất cả bài viết</h2><span class="count" id="pcount"></span></div>
+      <div class="chips" id="chips">
+        <button class="chip" data-cat="all" aria-pressed="true">Tất cả</button>
+        <button class="chip" data-cat="ai" aria-pressed="false">AI / ML</button>
+        <button class="chip" data-cat="coban" aria-pressed="false">Cơ bản</button>
+        <button class="chip" data-cat="thuattoan" aria-pressed="false">Thuật toán</button>
+        <button class="chip" data-cat="hethong" aria-pressed="false">Hệ thống</button>
+        <button class="chip" data-cat="web" aria-pressed="false">Web</button>
+      </div>
+      <div class="cards" id="cards">
+
+        <a class="card" href="posts/transformer.html" data-cat="ai">
           <span class="badge ok">Có sẵn</span>
           <span class="ic">🧊</span>
           <h3>Bên trong một Transformer</h3>
-          <p>Tháp 3D xoay được của một mô hình ngôn ngữ (GPT). Xem forward pass thật: token → embedding → attention → MLP → đoán từ. Có tour dẫn dắt cho người mới.</p>
-          <div class="tags"><span class="tag">Transformer</span><span class="tag">Attention</span><span class="tag">3D</span></div>
+          <p>Tháp 3D tương tác của một mô hình ngôn ngữ GPT — forward pass thật, attention, tham số.</p>
+          <div class="meta"><span class="cat">AI / ML</span> · <span>tương tác</span></div>
           <span class="go">Bắt đầu →</span>
         </a>
 
-        <div class="card soon">
-          <span class="badge soon">Sắp ra mắt</span>
+        <div class="card soon" data-cat="ai">
+          <span class="badge soon">Sắp ra</span>
           <span class="ic">🎯</span>
           <h3>Cơ chế Attention chuyên sâu</h3>
-          <p>Đào sâu Q · K · V, multi-head, và vì sao “attention is all you need”. Xem từng phép chấm điểm và trọng số.</p>
-          <div class="tags"><span class="tag">Attention</span><span class="tag">Q/K/V</span></div>
+          <p>Q · K · V, multi-head, và vì sao “attention is all you need”.</p>
+          <div class="meta"><span class="cat">AI / ML</span></div>
         </div>
 
-        <div class="card soon">
-          <span class="badge soon">Sắp ra mắt</span>
-          <span class="ic">🔤</span>
-          <h3>Tokenizer &amp; Embedding</h3>
-          <p>Chữ biến thành số như thế nào? BPE, từ điển, và không gian ý nghĩa của các vector.</p>
-          <div class="tags"><span class="tag">Token</span><span class="tag">Embedding</span></div>
+        <div class="card soon" data-cat="coban">
+          <span class="badge soon">Sắp ra</span>
+          <span class="ic">🔢</span>
+          <h3>Số nhị phân &amp; cách máy tính “nghĩ”</h3>
+          <p>Bit, byte, bù hai, dấu phẩy động — giải thích bằng hình.</p>
+          <div class="meta"><span class="cat">Cơ bản</span></div>
         </div>
 
-        <div class="card soon">
-          <span class="badge soon">Sắp ra mắt</span>
-          <span class="ic">📉</span>
-          <h3>Huấn luyện &amp; Gradient Descent</h3>
-          <p>Mô hình “học” ra sao: hàm mất mát, đạo hàm, và cách trọng số được cập nhật từng bước.</p>
-          <div class="tags"><span class="tag">Training</span><span class="tag">Gradient</span></div>
+        <div class="card soon" data-cat="thuattoan">
+          <span class="badge soon">Sắp ra</span>
+          <span class="ic">🔀</span>
+          <h3>Thuật toán sắp xếp — nhìn là hiểu</h3>
+          <p>Quick sort, merge sort, heap sort chạy từng bước, so sánh trực quan.</p>
+          <div class="meta"><span class="cat">Thuật toán</span></div>
         </div>
 
-      </div>
-    </section>
+        <div class="card soon" data-cat="hethong">
+          <span class="badge soon">Sắp ra</span>
+          <span class="ic">🧠</span>
+          <h3>Bộ nhớ &amp; cache hoạt động ra sao</h3>
+          <p>Stack/heap, phân trang, và vì sao cache thay đổi tất cả.</p>
+          <div class="meta"><span class="cat">Hệ thống</span></div>
+        </div>
 
-    <section>
-      <div class="sec-head"><h2>Vì sao học ở đây</h2></div>
-      <div class="why">
-        <div class="w"><div class="k">⚙️</div><h4>Chạy thật, không mô phỏng suông</h4><p>Mọi con số đều được tính trực tiếp trong trình duyệt — bạn thấy đúng thứ mô hình thấy.</p></div>
-        <div class="w"><div class="k">🖐️</div><h4>Tương tác &amp; trực quan</h4><p>Xoay, zoom, bấm vào từng bước. Hiểu bằng cách chạm vào, không chỉ đọc.</p></div>
-        <div class="w"><div class="k">🌱</div><h4>Từ số 0 đến chuyên sâu</h4><p>Có tour dẫn dắt cho người mới, và số liệu/công thức đầy đủ cho ai muốn đào sâu.</p></div>
+        <div class="card soon" data-cat="web">
+          <span class="badge soon">Sắp ra</span>
+          <span class="ic">🌐</span>
+          <h3>Một request đi từ trình duyệt tới server</h3>
+          <p>DNS → TCP → TLS → HTTP: hành trình của một cú Enter.</p>
+          <div class="meta"><span class="cat">Web</span></div>
+        </div>
+
       </div>
     </section>
   </div>
 </main>
 
 <footer><div class="wrap">
-  <span>© <span id="yr"></span> AI Trực Quan — dự án học tập mã nguồn mở.</span>
-  <span><a href="https://github.com/quaqducc/transformer_visualize" target="_blank" rel="noopener">Mã nguồn trên GitHub ↗</a></span>
+  <span>© <span id="yr"></span> Giải Mã — blog kiến thức CNTT trực quan. Mã nguồn mở.</span>
+  <span><a href="about.html">Giới thiệu</a> · <a href="https://github.com/quaqducc/transformer_visualize" target="_blank" rel="noopener">GitHub ↗</a></span>
 </div></footer>
-<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+<script>
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  // theme toggle
+  const html=document.documentElement, tb=document.getElementById('themeBtn');
+  function eff(){return html.dataset.theme || (matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');}
+  function paint(){tb.textContent=eff()==='dark'?'🌙':'☀️';}
+  tb.onclick=()=>{const n=eff()==='dark'?'light':'dark';html.dataset.theme=n;try{localStorage.setItem('giaima-theme',n);}catch(e){}paint();};
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change',paint); paint();
+  // category filter
+  const cards=[...document.querySelectorAll('#cards .card')];
+  const setCount=()=>document.getElementById('pcount').textContent=cards.filter(c=>!c.classList.contains('hide')).length+' bài';
+  document.querySelectorAll('#chips .chip').forEach(ch=>ch.onclick=()=>{
+    const cat=ch.dataset.cat;
+    document.querySelectorAll('#chips .chip').forEach(x=>x.setAttribute('aria-pressed',x===ch));
+    cards.forEach(c=>c.classList.toggle('hide',cat!=='all'&&c.dataset.cat!==cat));
+    setCount();
+  });
+  setCount();
+</script>
 </body>
 </html>

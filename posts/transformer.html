@@ -3,14 +3,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Bai hoc: Ben trong mot Transformer (GPT decoder-only) - forward pass that trong trinh duyet">
+<meta name="description" content="Bai viet: Ben trong mot Transformer (GPT decoder-only) - Giai Ma">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111114'/%3E%3Crect x='8' y='9' width='16' height='4' rx='2' fill='%23ff3b47'/%3E%3Crect x='8' y='15' width='13' height='4' rx='2' fill='%23e8e6ea'/%3E%3Crect x='8' y='21' width='10' height='4' rx='2' fill='%238a8790'/%3E%3C/svg%3E">
 <title>Transformer — Tháp 3D (GPT decoder-only)</title>
 <style>
   :root{
     color-scheme:light;
     --bg:#eef1f5;--surface:#ffffff;--surface-2:#f5f8fb;
     --ink:#141922;--ink-2:#48505f;--muted:#7c8593;
-    --line:#e3e8ef;--accent:#2a6fd6;--accent-2:#1c5cab;--accent-ink:#fff;--accent-soft:#e7f0fc;
+    --line:#e3e8ef;--accent:#d81f2c;--accent-2:#ad1622;--accent-ink:#fff;--accent-soft:#fdecee;
     --heat-neg:#1c5cab;--heat-mid:#eceef1;--heat-pos:#c23b3b;--seq-lo:#eaf2fd;--seq-hi:#184f95;
     --h0:#2a78d6;--h1:#eb6834;--h2:#1baf7a;--good:#0ca30c;--gold:#c98500;
     --scene-bg1:#eaf0f7;--scene-bg2:#dde6f0;
@@ -21,7 +22,7 @@
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
     color-scheme:dark;--bg:#0b0e13;--surface:#141922;--surface-2:#10151c;
     --ink:#e9edf3;--ink-2:#a6b0be;--muted:#6e7784;--line:#242c37;
-    --accent:#4a92ee;--accent-2:#6aa8f0;--accent-ink:#0b0e13;--accent-soft:#16273c;
+    --accent:#ff3b47;--accent-2:#d21f2c;--accent-ink:#ffffff;--accent-soft:#2a1418;
     --heat-neg:#6aa8f0;--heat-mid:#1f2731;--heat-pos:#ec7a7a;--seq-lo:#0f2035;--seq-hi:#7ab0f2;
     --h0:#3987e5;--h1:#e8794a;--h2:#2bc189;--good:#2fce6a;--gold:#e0a53a;
     --scene-bg1:#0f151d;--scene-bg2:#0a0e14;
@@ -30,7 +31,7 @@
   :root[data-theme="dark"]{
     color-scheme:dark;--bg:#0b0e13;--surface:#141922;--surface-2:#10151c;
     --ink:#e9edf3;--ink-2:#a6b0be;--muted:#6e7784;--line:#242c37;
-    --accent:#4a92ee;--accent-2:#6aa8f0;--accent-ink:#0b0e13;--accent-soft:#16273c;
+    --accent:#ff3b47;--accent-2:#d21f2c;--accent-ink:#ffffff;--accent-soft:#2a1418;
     --heat-neg:#6aa8f0;--heat-mid:#1f2731;--heat-pos:#ec7a7a;--seq-lo:#0f2035;--seq-hi:#7ab0f2;
     --h0:#3987e5;--h1:#e8794a;--h2:#2bc189;--good:#2fce6a;--gold:#e0a53a;
     --scene-bg1:#0f151d;--scene-bg2:#0a0e14;
@@ -192,7 +193,7 @@
 </style>
 
 <div class="topbar"><div class="topbar-in">
-  <a class="homelink" href="../index.html" title="Về trang chủ">← Trang chủ</a>
+  <a class="homelink" href="../index.html" title="Về trang chủ Giải Mã">← Giải Mã</a>
   <div class="brand">🧊 <span>Transformer</span> <span class="b">· tháp 3D</span></div>
   <input id="input" type="text" value="the cat sat on the mat" autocomplete="off" spellcheck="false">
   <div class="ctrls">

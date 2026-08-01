@@ -1,66 +1,45 @@
-# AI Trực Quan — website học tập
+# Giải Mã — blog kiến thức CNTT bằng hình
 
-Học cách các mô hình AI hoạt động bằng những **bài học tương tác, chạy thật trong trình duyệt**. Không lý thuyết suông: xoay, bấm, và thấy từng con số chảy qua mô hình.
+**Giải Mã** là một blog về Công nghệ thông tin, giải thích các khái niệm bằng **hình ảnh trực quan** và, khi có thể, bằng **demo tương tác chạy thật** trong trình duyệt.
 
-- **Static thuần**: chỉ HTML + CSS + JS inline. **Không backend, không build, không gọi mạng ngoài.**
+- **Static thuần**: HTML + CSS + JS inline. **Không backend, không build, không gọi mạng ngoài.**
+- Tông màu **đỏ – đen**, hỗ trợ sáng/tối (nút chuyển + theo hệ điều hành).
 - Chạy được ở bất kỳ static host nào (Vercel, Netlify, GitHub Pages, Cloudflare Pages…).
 
 ## Cấu trúc
 
 ```
-index.html                 ← Trang chủ (landing) — danh mục bài học
-lessons/
-  transformer.html         ← Bài học: "Bên trong một Transformer" (tháp 3D GPT)
-README.md
-.gitignore
+index.html                 ← Trang chủ blog: hero + bài nổi bật + danh sách bài (lọc theo chủ đề)
+about.html                 ← Giới thiệu
+posts/
+  transformer.html         ← Bài: "Bên trong một Transformer" (tháp 3D GPT, tương tác)
+README.md  ·  .gitignore
 ```
 
-- Landing (`index.html`) liệt kê các bài học; thẻ "Bên trong một Transformer" dẫn tới `lessons/transformer.html`.
-- Trang bài học có nút **← Trang chủ** quay lại landing.
-- Thêm bài mới: tạo `lessons/<tên>.html` rồi thêm một thẻ `<a class="card">` trong mục Bài học ở `index.html`.
+- Header/footer & bộ màu giống nhau trên mọi trang; nút 🌙/☀️ đổi sáng/tối (lưu bằng `localStorage`).
+- Trang chủ có **lọc theo chủ đề** (AI/ML · Cơ bản · Thuật toán · Hệ thống · Web) bằng JS thuần.
 
-### Bài "Bên trong một Transformer"
-Tháp **3D tương tác** một Transformer kiểu **GPT (decoder-only)**: nhập một câu, xem forward pass **thật** chảy qua embedding → block (attention 3 head song song, MLP) → LayerNorm → Linear → Softmax; có tour dẫn dắt cho người mới, nhãn "dễ hiểu", cung attention, và số tham số so với GPT-2/GPT-3. Toàn bộ là một file HTML self-contained.
+### Thêm một bài viết mới
+1. Tạo file `posts/<tên>.html` (một trang self-contained, có nút `← Giải Mã` về `../index.html`).
+2. Ở `index.html`, copy một thẻ `<a class="card" data-cat="...">` trong `#cards`, sửa icon/tiêu đề/mô tả/link và `data-cat` (để lọc đúng chủ đề). Bỏ class `soon` khi bài đã sẵn sàng.
 
 ## Chạy thử ở máy
-
-Mở thẳng `index.html` bằng trình duyệt, hoặc chạy một server tĩnh (khuyến nghị, để đường dẫn giữa các trang hoạt động đúng như production):
 
 ```bash
 npx serve .
 # hoặc
 python -m http.server 8000
 ```
-
-Rồi mở http://localhost:3000 (serve) hoặc http://localhost:8000.
+Mở http://localhost:3000 (serve) hoặc http://localhost:8000. (Nên chạy qua server để đường dẫn giữa các trang đúng như production.)
 
 ## Deploy lên Vercel
 
-### Cách 1 — Vercel + GitHub (khuyến nghị)
-1. Repo đã ở trên GitHub. Vào https://vercel.com/new → **Import** repo này.
-2. Framework preset để **Other**, không cần Build Command / Output Directory → **Deploy**.
-3. Từ nay mỗi lần `git push`, Vercel tự deploy lại (mỗi PR có bản preview riêng).
+- **GitHub → Vercel (khuyến nghị):** repo đã ở GitHub → https://vercel.com/new → **Import** → Framework preset **Other**, để trống Build/Output → **Deploy**. Mỗi `git push` sau đó tự deploy lại.
+- **CLI:** `npm i -g vercel` rồi `vercel` (preview) / `vercel --prod`.
 
-### Cách 2 — Vercel CLI
-```bash
-npm i -g vercel
-cd "D:/Personal Project/Transformer Visualize"
-vercel            # preview
-vercel --prod     # production
-```
-Khi hỏi *Framework preset* → **Other**; Build/Output để trống.
+> Không cần `vercel.json` — Vercel tự phục vụ `index.html` ở gốc và các file trong `posts/`.
 
-> Không cần `vercel.json` — Vercel tự phục vụ `index.html` ở gốc và các file trong `lessons/`.
+## Thương hiệu
 
-## Các nền tảng khác
-
-| Nền tảng | Cách nhanh nhất |
-|---|---|
-| **Netlify** | Kéo–thả cả thư mục vào https://app.netlify.com/drop |
-| **GitHub Pages** | Settings → Pages → Deploy from branch `main` `/root` |
-| **Cloudflare Pages** | Connect Git → build command để trống, output `/` |
-
-## Ghi chú
-
-- Tên "AI Trực Quan" là tên tạm — đổi trong `index.html` (logo ở header + footer + `<title>`).
-- Bài học Transformer được sinh từ một file nguồn; muốn tách `style.css` / `app.js` cho dễ bảo trì thì nói mình.
+- Tên **Giải Mã** và logo (3 thanh xếp lớp, thanh đỏ trên cùng — “bóc tách kiến thức thành lớp rõ ràng”) là inline SVG + favicon data-URI, đổi được ngay trong `index.html` / `about.html`.
+- Muốn tách `style.css` / `app.js`, đổi tên brand, hay thêm bài mới — cứ nói.

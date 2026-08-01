@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Giới thiệu về Giải Mã — blog kiến thức CNTT giải thích bằng hình ảnh trực quan.">
+<meta name="color-scheme" content="dark light">
+<title>Giới thiệu — Giải Mã</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111114'/%3E%3Crect x='8' y='9' width='16' height='4' rx='2' fill='%23ff3b47'/%3E%3Crect x='8' y='15' width='13' height='4' rx='2' fill='%23e8e6ea'/%3E%3Crect x='8' y='21' width='10' height='4' rx='2' fill='%238a8790'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('giaima-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<style>
+  :root{color-scheme:dark;
+    --bg:#0c0b0e;--surface:#161419;--surface-2:#201d24;
+    --ink:#f4f2f6;--ink-2:#b4afba;--muted:#7e7a86;--line:#2a2730;
+    --accent:#ff3b47;--accent-2:#d21f2c;--accent-ink:#fff;--accent-soft:#2a1418;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 50px -22px rgba(0,0,0,.8);
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Code","JetBrains Mono","SF Mono",Menlo,Consolas,monospace;}
+  @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;
+    --bg:#f6f5f7;--surface:#fff;--surface-2:#f1eff2;--ink:#17151b;--ink-2:#4c4954;--muted:#87838f;--line:#e7e3ea;
+    --accent:#d81f2c;--accent-2:#ad1622;--accent-soft:#fdecee;--shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);}}
+  :root[data-theme="light"]{color-scheme:light;
+    --bg:#f6f5f7;--surface:#fff;--surface-2:#f1eff2;--ink:#17151b;--ink-2:#4c4954;--muted:#87838f;--line:#e7e3ea;
+    --accent:#d81f2c;--accent-2:#ad1622;--accent-soft:#fdecee;--shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  header.site{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(10px) saturate(1.3);border-bottom:1px solid var(--line)}
+  .site-in{max-width:1080px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo svg{width:30px;height:30px;border-radius:8px}
+  .logo .wm{font-weight:800;letter-spacing:-.01em;font-size:18px}.logo .wm b{color:var(--accent)}
+  nav{margin-left:auto;display:flex;align-items:center;gap:6px}
+  .nav-link{font-size:14px;font-weight:600;color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:9px}
+  .nav-link:hover{color:var(--ink);background:var(--surface-2)}
+  @media(max-width:600px){.nav-link{display:none}}
+  .iconbtn{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;cursor:pointer;font-size:16px}
+  .iconbtn:hover{border-color:var(--accent)}
+  .btn{font-size:14px;font-weight:650;text-decoration:none;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 16px;display:inline-flex;gap:7px;align-items:center}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .btn:hover{border-color:var(--accent)}
+  main{padding:50px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(30px,5vw,44px);line-height:1.06;letter-spacing:-.02em;font-weight:850;margin:.3em 0 .4em;text-wrap:balance}
+  h2{font-size:21px;font-weight:800;letter-spacing:-.01em;margin:34px 0 10px}
+  p{font-size:16.5px;color:var(--ink-2);margin:0 0 15px}
+  p b{color:var(--ink)}
+  .lead{font-size:19px;color:var(--ink)}
+  ul{color:var(--ink-2);font-size:16px;padding-left:20px;margin:0 0 15px}
+  li{margin:6px 0}
+  .vals{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:14px 0 6px}
+  .val{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px 18px}
+  .val .k{font-size:22px}.val h3{margin:8px 0 4px;font-size:16px}.val p{margin:0;font-size:14px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+  footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 60px;color:var(--muted);font-size:13.5px}
+  footer .wrap{max-width:1080px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  footer a{color:var(--ink-2);text-decoration:none}footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="site"><div class="site-in">
+  <a class="logo" href="index.html" aria-label="Giải Mã — trang chủ">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#111114"/><rect x="8" y="9" width="16" height="4" rx="2" fill="#ff3b47"/><rect x="8" y="15" width="13" height="4" rx="2" fill="#e8e6ea"/><rect x="8" y="21" width="10" height="4" rx="2" fill="#8a8790"/></svg>
+    <span class="wm">Giải<b>Mã</b></span>
+  </a>
+  <nav>
+    <a class="nav-link" href="index.html#posts">Bài viết</a>
+    <a class="nav-link" href="about.html">Giới thiệu</a>
+    <a class="nav-link" href="https://github.com/quaqducc/transformer_visualize" target="_blank" rel="noopener">GitHub</a>
+    <button class="iconbtn" id="themeBtn" title="Đổi giao diện sáng/tối" aria-label="Đổi giao diện">🌙</button>
+  </nav>
+</div></header>
+
+<main><div class="wrap">
+  <div class="eyebrow">Giới thiệu</div>
+  <h1>Kiến thức khó, kể lại bằng hình.</h1>
+  <p class="lead"><b>Giải Mã</b> là một blog về Công nghệ thông tin, nơi những khái niệm tưởng như khô khan được <b>giải thích bằng hình ảnh trực quan</b> — và khi có thể, bằng những <b>demo tương tác chạy thật</b> ngay trong trình duyệt.</p>
+
+  <h2>Vì sao?</h2>
+  <p>Rất nhiều thứ trong ngành — transformer, thuật toán, mạng máy tính, bộ nhớ — <b>khó hiểu không phải vì bản chất phức tạp, mà vì cách trình bày</b>. Một sơ đồ đúng, một demo bấm được, thường thắng cả chục trang chữ. Giải Mã cố gắng làm đúng điều đó: biến cái trừu tượng thành cái bạn <b>nhìn thấy và chạm được</b>.</p>
+
+  <h2>Dành cho ai</h2>
+  <ul>
+    <li>Người mới muốn hiểu bản chất mà không ngợp công thức.</li>
+    <li>Sinh viên &amp; lập trình viên muốn ôn lại nền tảng cho vững.</li>
+    <li>Bất kỳ ai tò mò “cái này thực ra hoạt động thế nào?”.</li>
+  </ul>
+
+  <h2>Giá trị cốt lõi</h2>
+  <div class="vals">
+    <div class="val"><div class="k">⚙️</div><h3>Thật, không suông</h3><p>Ưu tiên demo tính toán thật thay vì mô phỏng hình thức.</p></div>
+    <div class="val"><div class="k">🖐️</div><h3>Tương tác</h3><p>Học bằng cách bấm, kéo, thử — không chỉ đọc.</p></div>
+    <div class="val"><div class="k">🌱</div><h3>Từ số 0</h3><p>Dẫn dắt người mới, nhưng vẫn có chiều sâu cho người rành.</p></div>
+  </div>
+
+  <h2>Mã nguồn mở</h2>
+  <p>Toàn bộ trang là static, self-contained, và <b>mã nguồn mở</b> trên GitHub. Bạn có thể xem cách mọi thứ được dựng, hoặc góp ý.</p>
+
+  <div class="cta">
+    <a class="btn primary" href="posts/transformer.html">🧊 Đọc bài đầu tiên</a>
+    <a class="btn" href="https://github.com/quaqducc/transformer_visualize" target="_blank" rel="noopener">Xem trên GitHub ↗</a>
+  </div>
+</div></main>
+
+<footer><div class="wrap">
+  <span>© <span id="yr"></span> Giải Mã</span>
+  <span><a href="index.html">Trang chủ</a> · <a href="https://github.com/quaqducc/transformer_visualize" target="_blank" rel="noopener">GitHub ↗</a></span>
+</div></footer>
+<script>
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  const html=document.documentElement, tb=document.getElementById('themeBtn');
+  const eff=()=>html.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+  const paint=()=>tb.textContent=eff()==='dark'?'🌙':'☀️';
+  tb.onclick=()=>{const n=eff()==='dark'?'light':'dark';html.dataset.theme=n;try{localStorage.setItem('giaima-theme',n);}catch(e){}paint();};
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change',paint);paint();
+</script>
+</body>
+</html>
