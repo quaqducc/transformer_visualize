@@ -28,8 +28,9 @@
   .status b{color:var(--accent)}
   .pg-top .sp{margin-left:auto;display:flex;gap:8px}
   /* nút .btn — dùng từ style.css chung */
-  .graphscroll{overflow:auto;max-height:380px;cursor:grab;background:repeating-linear-gradient(90deg,transparent,transparent 77px,color-mix(in srgb,var(--line) 40%,transparent) 77px,color-mix(in srgb,var(--line) 40%,transparent) 78px)}
+  .graphscroll{overflow:hidden;max-height:380px;cursor:grab;touch-action:none;background:repeating-linear-gradient(90deg,transparent,transparent 77px,color-mix(in srgb,var(--line) 40%,transparent) 77px,color-mix(in srgb,var(--line) 40%,transparent) 78px)}
   .graphscroll.grabbing{cursor:grabbing}
+  #graph{transform-origin:0 0}
   #graph{display:block}
   .gedge{stroke:var(--muted);stroke-width:2;fill:none;opacity:.6}
   .gedge.m2{stroke:var(--gold)}
@@ -81,8 +82,10 @@
   .scn button{text-align:left;font-family:var(--sans);font-size:13.5px;font-weight:600;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:10px 13px;cursor:pointer}
   .scn button:hover{border-color:var(--accent)}
   .scn button .d{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:2px}
-  .tour{position:absolute;left:12px;right:12px;bottom:12px;z-index:9;background:var(--surface);border:1px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:13px 15px;display:none}
+  .tour{position:fixed;right:16px;bottom:16px;left:auto;top:auto;z-index:60;width:min(460px,92vw);background:var(--surface);border:1px solid var(--accent);border-radius:12px;box-shadow:0 12px 44px -8px rgba(0,0,0,.6),var(--shadow);padding:11px 15px 13px;display:none;cursor:move;user-select:none}
   .tour.on{display:block}
+  .tour .grip{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+  .tour button{cursor:pointer}
   .tour .ti{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700}
   .tour h4{margin:3px 0 0;font-size:15px}.tour p{margin:5px 0 0;font-size:13.5px;color:var(--ink-2)}
   .tour .tc{display:flex;justify-content:space-between;align-items:center;margin-top:11px;gap:10px;flex-wrap:wrap}
@@ -188,9 +191,6 @@
       </div>
     </div>
 
-    <div class="tour" id="tour"><span class="ti" id="tstep"></span><h4 id="ttitle"></h4><p id="ttext"></p>
-      <div class="tc"><div class="dots" id="tdots"></div><div style="display:flex;gap:7px"><button class="btn ghost" id="tprev">‹</button><button class="btn primary" id="tnext">Tiếp ›</button><button class="btn ghost" id="texit">Thoát</button></div></div>
-    </div>
     <div class="veil" id="veil"><div class="vcard">
       <h3>🌿 Học Git bằng cách nhìn</h3>
       <p>Chọn một kịch bản để được dẫn từng bước (đồ thị tự chạy + giải thích), hoặc tự chơi với các nút bên dưới.</p>
@@ -268,6 +268,12 @@
   <span><a href="../index.html">Trang chủ</a> · <a href="https://github.com/quaqducc/transformer_visualize" target="_blank" rel="noopener">GitHub ↗</a></span>
 </div></footer>
 
+<div class="tour" id="tour">
+  <div class="grip">⠿ kéo để di chuyển bảng · nổi trên mọi phần</div>
+  <span class="ti" id="tstep"></span><h4 id="ttitle"></h4><p id="ttext"></p>
+  <div class="tc"><div class="dots" id="tdots"></div><div style="display:flex;gap:7px"><button class="btn ghost" id="tprev">‹</button><button class="btn primary" id="tnext">Tiếp ›</button><button class="btn ghost" id="texit">Thoát</button></div></div>
+</div>
+
 <script>
 /* ============ ENGINE ============ */
 const FILES=["app.js","style.css","README.md"];
@@ -297,6 +303,10 @@ function colleaguePush(s){const rk="origin/main",base=s.remote[rk]??null;if(base
 /* ============ STATE + RENDER ============ */
 const $=id=>document.getElementById(id);
 let st=newRepo(), logLines=[], newest=null, selCommit=null, replaying=false;
+let graphPan={x:0,y:0}, lastFollow=null, gW=0, gH=0;
+function applyPan(){const gs=$('graphscroll');if(!gs)return;const vw=gs.clientWidth||600,vh=gs.clientHeight||300;
+  graphPan.x=Math.max(Math.min(0,vw-gW)-70,Math.min(graphPan.x,70));graphPan.y=Math.max(Math.min(0,vh-gH)-70,Math.min(graphPan.y,70));
+  const g=$('graph');if(g)g.style.transform=`translate(${graphPan.x}px,${graphPan.y}px)`;}
 const BRCOLORS={}; const PAL=['--gold','--cyan','--violet','--good'];
 function brColor(name){if(name==='main')return getCss('--accent');if(!(name in BRCOLORS)){const i=Object.keys(BRCOLORS).length%PAL.length;BRCOLORS[name]=PAL[i];}return getCss(BRCOLORS[name]);}
 function getCss(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
@@ -320,7 +330,9 @@ function renderGraph(){const s=st;const COL=78,LANE=64,R=16,PADX=44;const g=genO
     n+='</g>';});
   const svg=$('graph');svg.setAttribute('width',W);svg.setAttribute('height',H);svg.innerHTML=e+n;
   svg.querySelectorAll('.gnode').forEach(el=>el.onclick=()=>{selCommit=el.dataset.id;const r=act(doCheckoutCommit,el.dataset.id);render();});
-  const gs=$('graphscroll');gs.scrollLeft=gs.scrollWidth;
+  gW=W;gH=H;const gs=$('graphscroll'),vw=gs.clientWidth||600;
+  if(newest!==lastFollow){lastFollow=newest;graphPan.x=W>vw?vw-W-14:0;graphPan.y=0;}
+  applyPan();
 }
 function render(){renderGraph();
   // areas
@@ -354,11 +366,17 @@ $('bHard').onclick=()=>{if(confirm('reset --hard sẽ XOÁ thay đổi chưa com
 $('bRevert').onclick=()=>run(doRevert);
 $('bPush').onclick=()=>run(doPush);$('bPull').onclick=()=>run(doPull);$('bFetch').onclick=()=>run(doFetch);$('bColleague').onclick=()=>run(colleaguePush);
 $('resetRepo').onclick=()=>{st=newRepo();logLines=[];newest=null;selCommit=null;render();};
-/* kéo để pan khu đồ thị (chuột) */
-(function(){const gs=$('graphscroll');let drag=false,sx,sy,sl,stp;
-  gs.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;if(e.target.closest&&e.target.closest('.gnode'))return;drag=true;sx=e.clientX;sy=e.clientY;sl=gs.scrollLeft;stp=gs.scrollTop;gs.classList.add('grabbing');});
-  window.addEventListener('pointermove',e=>{if(!drag)return;gs.scrollLeft=sl-(e.clientX-sx);gs.scrollTop=stp-(e.clientY-sy);});
-  window.addEventListener('pointerup',()=>{if(drag){drag=false;gs.classList.remove('grabbing');}});})();
+/* kéo để pan khu đồ thị (transform — luôn kéo được, kể cả đồ thị nhỏ) */
+(function(){const gs=$('graphscroll');let drag=false,sx,sy,ox,oy;
+  gs.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.gnode'))return;drag=true;sx=e.clientX;sy=e.clientY;ox=graphPan.x;oy=graphPan.y;gs.classList.add('grabbing');gs.setPointerCapture&&gs.setPointerCapture(e.pointerId);});
+  gs.addEventListener('pointermove',e=>{if(!drag)return;graphPan.x=ox+(e.clientX-sx);graphPan.y=oy+(e.clientY-sy);applyPan();});
+  const end=()=>{drag=false;gs.classList.remove('grabbing');};
+  gs.addEventListener('pointerup',end);gs.addEventListener('pointercancel',end);})();
+/* kéo bảng hướng dẫn (panel nổi) đặt bất kỳ đâu */
+(function(){const t=$('tour');let drag=false,sx,sy,ol,ot;
+  t.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;drag=true;const r=t.getBoundingClientRect();ol=r.left;ot=r.top;sx=e.clientX;sy=e.clientY;t.style.left=ol+'px';t.style.top=ot+'px';t.style.right='auto';t.style.bottom='auto';t.setPointerCapture&&t.setPointerCapture(e.pointerId);});
+  t.addEventListener('pointermove',e=>{if(!drag)return;let x=ol+(e.clientX-sx),y=ot+(e.clientY-sy);const w=t.offsetWidth,h=t.offsetHeight;x=Math.max(6,Math.min(x,innerWidth-w-6));y=Math.max(6,Math.min(y,innerHeight-h-6));t.style.left=x+'px';t.style.top=y+'px';});
+  const end=()=>drag=false;t.addEventListener('pointerup',end);t.addEventListener('pointercancel',end);})();
 
 /* ============ THEME ============ */
 $('yr').textContent=new Date().getFullYear();
