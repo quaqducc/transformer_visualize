@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Git nhìn là hiểu — commit, nhánh, merge, rebase, reset, remote qua đồ thị tương tác. Bài học của Giải Mã.">
+<meta name="color-scheme" content="dark light">
+<title>Git: nhánh & dòng thời gian, nhìn là hiểu — Giải Mã</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111114'/%3E%3Crect x='8' y='9' width='16' height='4' rx='2' fill='%23ff3b47'/%3E%3Crect x='8' y='15' width='13' height='4' rx='2' fill='%23e8e6ea'/%3E%3Crect x='8' y='21' width='10' height='4' rx='2' fill='%238a8790'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('giaima-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<style>
+  :root{color-scheme:dark;
+    --bg:#0c0b0e;--surface:#161419;--surface-2:#201d24;--raise:#26222b;
+    --ink:#f4f2f6;--ink-2:#b4afba;--muted:#7e7a86;--line:#2a2730;
+    --accent:#ff3b47;--accent-2:#d21f2c;--accent-ink:#fff;--accent-soft:#2a1418;
+    --good:#37d07a;--gold:#f5a623;--cyan:#22c1c3;--violet:#a97bff;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 50px -22px rgba(0,0,0,.8);
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Code","JetBrains Mono","SF Mono",Menlo,Consolas,monospace;}
+  @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;
+    --bg:#f6f5f7;--surface:#fff;--surface-2:#f1eff2;--raise:#fff;--ink:#17151b;--ink-2:#4c4954;--muted:#87838f;--line:#e7e3ea;
+    --accent:#d81f2c;--accent-2:#ad1622;--accent-soft:#fdecee;--shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);}}
+  :root[data-theme="light"]{color-scheme:light;
+    --bg:#f6f5f7;--surface:#fff;--surface-2:#f1eff2;--raise:#fff;--ink:#17151b;--ink-2:#4c4954;--muted:#87838f;--line:#e7e3ea;
+    --accent:#d81f2c;--accent-2:#ad1622;--accent-soft:#fdecee;--shadow:0 1px 2px rgba(16,16,20,.05),0 16px 44px -20px rgba(16,16,20,.22);}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  /* header */
+  header.site{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(10px) saturate(1.3);border-bottom:1px solid var(--line)}
+  .site-in{max-width:1080px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:12px}
+  .homelink{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink-2);text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:7px 11px;white-space:nowrap}
+  .homelink:hover{border-color:var(--accent);color:var(--ink)}
+  .logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+  .logo svg{width:26px;height:26px;border-radius:7px}.logo .wm{font-weight:800;font-size:16px}.logo .wm b{color:var(--accent)}
+  .iconbtn{margin-left:auto;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;cursor:pointer;font-size:15px}
+  .iconbtn:hover{border-color:var(--accent)}
+  /* article */
+  .post-head{padding:40px 0 8px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(28px,4.6vw,42px);line-height:1.08;letter-spacing:-.02em;font-weight:850;margin:.3em 0 .3em;text-wrap:balance}
+  .lede{font-size:18px;color:var(--ink-2);max-width:60ch;margin:0}
+  .lede b{color:var(--ink)}
+  /* playground */
+  .pg{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin:22px 0 8px}
+  .pg-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .status{font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
+  .status b{color:var(--accent)}
+  .pg-top .sp{margin-left:auto;display:flex;gap:8px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:650;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:8px 12px;display:inline-flex;gap:6px;align-items:center}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .btn.primary:hover{background:var(--accent-2)}
+  .btn.ghost{background:transparent}
+  .graphscroll{overflow:auto;max-height:340px;background:repeating-linear-gradient(90deg,transparent,transparent 77px,color-mix(in srgb,var(--line) 40%,transparent) 77px,color-mix(in srgb,var(--line) 40%,transparent) 78px)}
+  #graph{display:block}
+  .gedge{stroke:var(--muted);stroke-width:2;fill:none;opacity:.6}
+  .gedge.m2{stroke:var(--gold)}
+  .gnode circle{fill:var(--surface-2);stroke:var(--line);stroke-width:2;transition:.2s}
+  .gnode.merge circle{fill:var(--raise)}
+  .gnode.head circle{stroke:var(--accent);stroke-width:3.5;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--accent) 70%,transparent))}
+  .gnode.remote circle{stroke-dasharray:3 2}
+  .gnode.newest circle{animation:pop .5s}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+  .gnode text.h{fill:var(--ink-2);font-family:var(--mono);font-size:10px;text-anchor:middle;dominant-baseline:middle}
+  .gnode{cursor:pointer}
+  .gtag rect{rx:5}
+  .gtag text{font-family:var(--mono);font-size:10.5px;font-weight:700;dominant-baseline:middle}
+  .gtag.origin rect{fill:none;stroke-dasharray:3 2}
+  .gtag .headtag{fill:var(--accent)}
+  .cmsg{fill:var(--muted);font-family:var(--sans);font-size:10px;text-anchor:middle}
+  .panes{display:grid;grid-template-columns:1.15fr .85fr;gap:0}
+  @media(max-width:760px){.panes{grid-template-columns:1fr}}
+  .areas{padding:14px 16px;border-right:1px solid var(--line)}
+  @media(max-width:760px){.areas{border-right:0;border-bottom:1px solid var(--line)}}
+  .areas h4,.term h4{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:700}
+  .acols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .acol{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:8px;min-height:96px}
+  .acol .t{font-family:var(--mono);font-size:10.5px;color:var(--ink-2);font-weight:700;margin-bottom:7px;text-align:center}
+  .acol.work .t{color:var(--gold)}.acol.stage .t{color:var(--good)}.acol.repo .t{color:var(--muted)}
+  .fchip{font-family:var(--mono);font-size:11px;padding:5px 7px;border-radius:7px;margin:4px 0;border:1px solid var(--line);background:var(--surface);display:flex;justify-content:space-between;gap:6px;cursor:default}
+  .fchip.modified{border-color:var(--gold);color:var(--gold)}
+  .fchip.staged{border-color:var(--good);color:var(--good);cursor:pointer}
+  .term{padding:14px 16px;min-height:150px}
+  .termbox{font-family:var(--mono);font-size:12px;background:#0a0a0c;color:#e6e6ea;border:1px solid var(--line);border-radius:10px;padding:10px 12px;max-height:210px;overflow:auto;line-height:1.55}
+  :root[data-theme="light"] .termbox{background:#141216;color:#eee}
+  .termbox .c{color:#8fd0ff}.termbox .k{color:#ff7a84}.termbox .m{color:#9a97a2}
+  .toolbar{padding:12px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:9px}
+  .trow{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .trow .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);width:66px;flex:0 0 auto}
+  .tb{font-family:var(--mono);font-size:12px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 10px}
+  .tb:hover:not(:disabled){border-color:var(--accent)}
+  .tb:disabled{opacity:.4;cursor:not-allowed}
+  .tb.danger{border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
+  .tb.danger:hover:not(:disabled){background:var(--accent-soft)}
+  input.mi,select.mi{font-family:var(--mono);font-size:12px;background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  input.mi{width:110px}
+  /* intro + tour */
+  .veil{position:absolute;inset:0;z-index:8;display:grid;place-items:center;padding:18px;background:color-mix(in srgb,var(--surface) 78%,transparent);backdrop-filter:blur(3px)}
+  .veil.hidden{display:none}
+  .vcard{max-width:460px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:22px}
+  .vcard h3{margin:0 0 8px;font-size:20px}.vcard p{margin:0 0 14px;color:var(--ink-2);font-size:14px}
+  .scn{display:flex;flex-direction:column;gap:7px;margin:12px 0}
+  .scn button{text-align:left;font-family:var(--sans);font-size:13.5px;font-weight:600;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;padding:10px 13px;cursor:pointer}
+  .scn button:hover{border-color:var(--accent)}
+  .scn button .d{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:2px}
+  .tour{position:absolute;left:12px;right:12px;bottom:12px;z-index:9;background:var(--surface);border:1px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:13px 15px;display:none}
+  .tour.on{display:block}
+  .tour .ti{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .tour h4{margin:3px 0 0;font-size:15px}.tour p{margin:5px 0 0;font-size:13.5px;color:var(--ink-2)}
+  .tour .tc{display:flex;justify-content:space-between;align-items:center;margin-top:11px;gap:10px;flex-wrap:wrap}
+  .tour .dots{display:flex;gap:4px;flex-wrap:wrap}.tour .d{width:6px;height:6px;border-radius:50%;background:var(--line)}.tour .d.on{background:var(--accent)}
+  /* concept sections */
+  .concepts{padding:26px 0 0}
+  .concepts h2{font-size:22px;font-weight:800;letter-spacing:-.01em;margin:30px 0 8px}
+  .concepts h2 .n{font-family:var(--mono);color:var(--accent);font-size:15px;margin-right:8px}
+  .concepts p{font-size:16px;color:var(--ink-2);margin:0 0 12px;max-width:70ch}
+  .concepts p b{color:var(--ink)}
+  .concepts code{font-family:var(--mono);font-size:.88em;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+  .callout{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:12px 15px;margin:0 0 12px;font-size:14.5px;color:var(--ink-2)}
+  .callout b{color:var(--ink)}
+  /* cheat sheet */
+  .cheat{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:12px}
+  .cg{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px}
+  .cg h3{margin:0 0 10px;font-size:15px;color:var(--accent)}
+  .cg .row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:5px 0;border-top:1px solid var(--line-2, var(--line))}
+  .cg .row:first-of-type{border-top:0}
+  .cg code{font-family:var(--mono);font-size:12px;color:var(--ink)}
+  .cg .row span{color:var(--muted);text-align:right}
+  footer{border-top:1px solid var(--line);margin-top:40px;padding:24px 0 60px;color:var(--muted);font-size:13.5px}
+  footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  footer a{color:var(--ink-2);text-decoration:none}footer a:hover{color:var(--accent)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<header class="site"><div class="site-in">
+  <a class="homelink" href="../index.html" title="Về trang chủ Giải Mã">← Giải Mã</a>
+  <a class="logo" href="../index.html" aria-label="Giải Mã">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#111114"/><rect x="8" y="9" width="16" height="4" rx="2" fill="#ff3b47"/><rect x="8" y="15" width="13" height="4" rx="2" fill="#e8e6ea"/><rect x="8" y="21" width="10" height="4" rx="2" fill="#8a8790"/></svg>
+    <span class="wm">Giải<b>Mã</b></span>
+  </a>
+  <button class="iconbtn" id="themeBtn" title="Sáng/tối" aria-label="Đổi giao diện">🌙</button>
+</div></header>
+
+<div class="wrap">
+  <div class="post-head">
+    <div class="eyebrow">Công cụ · Tương tác</div>
+    <h1>Git: nhánh &amp; dòng thời gian, nhìn là hiểu</h1>
+    <p class="lede">Git thực ra <b>chính là một đồ thị commit theo thời gian</b>. Bấm nút chạy lệnh, xem <b>đồ thị</b>, <b>3 vùng</b> và <b>con trỏ</b> đổi ngay — merge, rebase, reset, remote sẽ hết đáng sợ.</p>
+  </div>
+
+  <div class="pg" id="pg">
+    <div class="pg-top">
+      <span class="status" id="status"></span>
+      <span class="sp">
+        <button class="btn ghost" id="tourBtn">🎓 Học nhanh</button>
+        <button class="btn ghost" id="resetRepo" title="Làm lại từ đầu">↺ Reset</button>
+      </span>
+    </div>
+
+    <div class="graphscroll" id="graphscroll"><svg id="graph" width="200" height="160"></svg></div>
+
+    <div class="panes">
+      <div class="areas">
+        <h4>3 vùng của Git — file đi từ trái sang phải</h4>
+        <div class="acols">
+          <div class="acol work"><div class="t">Working</div><div id="aWork"></div></div>
+          <div class="acol stage"><div class="t">Staging</div><div id="aStage"></div></div>
+          <div class="acol repo"><div class="t">Repo (đã commit)</div><div id="aRepo"></div></div>
+        </div>
+        <p style="font-size:11.5px;color:var(--muted);margin:9px 0 0">Mẹo: bấm chip <b style="color:var(--good)">xanh</b> để <code style="font-family:var(--mono)">git add</code> file đó.</p>
+      </div>
+      <div class="term">
+        <h4>Terminal — lệnh git tương ứng</h4>
+        <div class="termbox" id="term"></div>
+      </div>
+    </div>
+
+    <div class="toolbar" id="toolbar">
+      <div class="trow"><span class="lbl">Sửa &amp; lưu</span>
+        <button class="tb" data-a="edit" data-f="app.js">✏️ app.js</button>
+        <button class="tb" data-a="edit" data-f="style.css">✏️ style.css</button>
+        <button class="tb" data-a="edit" data-f="README.md">✏️ README.md</button>
+        <button class="tb" id="bAdd">git add .</button>
+        <input class="mi" id="msg" placeholder="thông điệp" value="cập nhật">
+        <button class="tb" id="bCommit">git commit</button>
+      </div>
+      <div class="trow"><span class="lbl">Nhánh</span>
+        <input class="mi" id="brName" value="feature">
+        <button class="tb" id="bSwitchNew">git switch -c</button>
+        <select class="mi" id="selSwitch"></select>
+        <button class="tb" id="bSwitch">git switch</button>
+        <button class="tb" id="bCheckout" title="Checkout commit đang chọn (detached)">checkout commit</button>
+      </div>
+      <div class="trow"><span class="lbl">Gộp</span>
+        <select class="mi" id="selMerge"></select>
+        <button class="tb" id="bMerge">git merge</button>
+        <select class="mi" id="selRebase"></select>
+        <button class="tb" id="bRebase">git rebase</button>
+      </div>
+      <div class="trow"><span class="lbl">Sửa sai</span>
+        <button class="tb" id="bSoft">reset --soft</button>
+        <button class="tb" id="bMixed">reset --mixed</button>
+        <button class="tb danger" id="bHard">reset --hard</button>
+        <button class="tb" id="bRevert">git revert</button>
+      </div>
+      <div class="trow"><span class="lbl">Remote</span>
+        <button class="tb" id="bPush">git push</button>
+        <button class="tb" id="bPull">git pull</button>
+        <button class="tb" id="bFetch">git fetch</button>
+        <button class="tb" id="bColleague" title="Mô phỏng người khác đẩy commit lên server">👤 Đồng nghiệp push</button>
+      </div>
+    </div>
+
+    <div class="tour" id="tour"><span class="ti" id="tstep"></span><h4 id="ttitle"></h4><p id="ttext"></p>
+      <div class="tc"><div class="dots" id="tdots"></div><div style="display:flex;gap:7px"><button class="btn ghost" id="tprev">‹</button><button class="btn primary" id="tnext">Tiếp ›</button><button class="btn ghost" id="texit">Thoát</button></div></div>
+    </div>
+    <div class="veil" id="veil"><div class="vcard">
+      <h3>🌿 Học Git bằng cách nhìn</h3>
+      <p>Chọn một kịch bản để được dẫn từng bước (đồ thị tự chạy + giải thích), hoặc tự chơi với các nút bên dưới.</p>
+      <div class="scn" id="scnList"></div>
+      <button class="btn" id="freeplay">Tự chơi tự do →</button>
+    </div></div>
+  </div>
+  <p style="font-size:12.5px;color:var(--muted);margin:2px 2px 0">Kéo ngang để xem đồ thị dài · bấm một commit để <code style="font-family:var(--mono)">checkout</code>.</p>
+
+  <div class="concepts">
+    <h2><span class="n">00</span>Git là gì, và vì sao</h2>
+    <p>Từng lưu file thành <code>baocao_final_v2_thatsu_cuoi.docx</code>? Git sinh ra để chấm dứt điều đó. Nó <b>ghi lại lịch sử</b> dự án: mỗi lần "lưu mốc" là một <b>commit</b> — một <b>ảnh chụp</b> toàn bộ dự án mà bạn luôn quay về được. Và bạn có thể tạo <b>nhánh</b> để thử nghiệm mà không phá bản chính, như những dòng thời gian song song.</p>
+
+    <h2><span class="n">01</span>Commit &amp; 3 vùng</h2>
+    <p>Một thay đổi đi qua 3 nơi: <b>Working Directory</b> (bạn đang sửa) → <code>git add</code> → <b>Staging</b> (chọn cái sẽ lưu) → <code>git commit</code> → <b>Repository</b> (khắc vào lịch sử). Ẩn dụ <b>giỏ hàng</b>: <code>add</code> = bỏ món muốn mua vào giỏ; <code>commit</code> = thanh toán, in hoá đơn (commit có mã hash + thông điệp).</p>
+    <div class="callout"><b>Chốt:</b> commit chỉ chụp thứ <b>đã ở Staging</b> — nên phải <code>add</code> rồi mới <code>commit</code>.</div>
+
+    <h2><span class="n">02</span>Dòng thời gian &amp; HEAD</h2>
+    <p>Mỗi commit trỏ về <b>cha</b> của nó, tạo thành chuỗi. <b>HEAD</b> là mũi tên "bạn đang đứng ở đâu" — thường trỏ tới nhánh hiện tại. <code>git checkout &lt;hash&gt;</code> đưa bạn về một commit cũ (trạng thái <i>detached HEAD</i>: xem được quá khứ nhưng đang đứng lệch khỏi nhánh).</p>
+    <div class="callout">Nhánh và HEAD chỉ là <b>con trỏ</b> — không phải bản sao thư mục. Đó là lý do Git nhẹ và nhanh.</div>
+
+    <h2><span class="n">03</span>Nhánh</h2>
+    <p>Một nhánh là <b>tờ ghi chú dán lên một commit</b>, và <b>tự trượt theo</b> mỗi khi bạn commit. <code>git switch -c feature</code> tạo &amp; nhảy sang nhánh mới; commit trên đó làm đồ thị <b>tách nhánh</b>, còn <code>main</code> đứng yên. Rẽ nhánh gần như miễn phí vì chỉ tạo một con trỏ.</p>
+
+    <h2><span class="n">04</span>Gộp nhánh — merge</h2>
+    <p>Hai kiểu: <b>fast-forward</b> (nếu <code>main</code> chưa đi tiếp, gộp chỉ là <i>đẩy con trỏ</i> tới ngọn nhánh kia — lịch sử thẳng, không tạo commit) và <b>3-way</b> (cả hai đã đi riêng → tạo một <b>merge commit có 2 cha</b>, nối hai dòng thời gian). Nếu hai bên sửa cùng một dòng, Git dừng lại báo <b>xung đột</b> để bạn chọn giữ gì.</p>
+    <div class="callout"><b>merge</b> giữ nguyên lịch sử của cả hai nhánh (có ngã ba).</div>
+
+    <h2><span class="n">05</span>Rebase — viết lại cho thẳng</h2>
+    <p><code>git rebase main</code> <b>nhấc các commit</b> của nhánh bạn ra và <b>phát lại</b> chúng lên <b>đỉnh</b> của <code>main</code> → lịch sử thành một đường thẳng. Lưu ý: các commit được <b>tạo lại với hash mới</b> (không còn là commit cũ).</p>
+    <div class="callout" style="border-left-color:var(--gold)"><b>Aha:</b> <b>Merge</b> = kể đúng chuyện đã xảy ra (có ngã ba). <b>Rebase</b> = kể lại cho gọn (một đường thẳng). Đẹp vs thật — tuỳ bạn chọn. <b>Đừng rebase nhánh đã push/chia sẻ</b> (viết lại lịch sử chung sẽ làm rối cả nhóm).</div>
+
+    <h2><span class="n">06</span>Sửa sai — reset &amp; revert</h2>
+    <p><code>git reset</code> <b>tua con trỏ nhánh</b> về commit khác. Ba mức khác nhau ở chỗ đụng tới 3 vùng: <b>--soft</b> giữ nguyên Staging + Working; <b>--mixed</b> (mặc định) bỏ Staging, giữ Working; <b>--hard</b> xoá sạch cả hai — <b style="color:var(--accent)">mất thay đổi</b>. <code>git revert</code> an toàn hơn: tạo một commit <b>đảo ngược</b> (không viết lại lịch sử) — hợp cho nhánh đã chia sẻ.</p>
+    <div class="callout"><b>reset</b> <i>di chuyển</i> lịch sử · <b>revert</b> <i>thêm</i> lịch sử.</div>
+
+    <h2><span class="n">07</span>Làm việc nhóm — remote</h2>
+    <p><code>origin</code> là tên mặc định của repo trên server (GitHub). <code>origin/main</code> là "main trên server <i>lần cuối mình thấy</i>" (vẽ nét đứt). <code>git push</code> đẩy commit local lên; <code>git pull</code> = <code>fetch</code> (tải về) + <code>merge</code>. Nếu server có commit bạn chưa có, <code>push</code> bị từ chối → bạn <code>pull</code> rồi <code>push</code> lại.</p>
+    <div class="callout">Local và remote là <b>hai bản đồng bộ thủ công</b> — không tự động.</div>
+
+    <h2><span class="n">08</span>Bảng tra cứu nhanh</h2>
+    <div class="cheat">
+      <div class="cg"><h3>Lưu</h3>
+        <div class="row"><code>git status</code><span>đang có gì</span></div>
+        <div class="row"><code>git add .</code><span>đưa vào Staging</span></div>
+        <div class="row"><code>git commit -m "…"</code><span>tạo mốc</span></div>
+        <div class="row"><code>git log</code><span>xem lịch sử</span></div>
+      </div>
+      <div class="cg"><h3>Nhánh</h3>
+        <div class="row"><code>git switch -c x</code><span>tạo &amp; sang</span></div>
+        <div class="row"><code>git switch x</code><span>đổi nhánh</span></div>
+        <div class="row"><code>git branch</code><span>liệt kê</span></div>
+      </div>
+      <div class="cg"><h3>Gộp</h3>
+        <div class="row"><code>git merge x</code><span>gộp x vào đây</span></div>
+        <div class="row"><code>git rebase x</code><span>phát lại lên x</span></div>
+      </div>
+      <div class="cg"><h3>Sửa sai</h3>
+        <div class="row"><code>git reset --soft</code><span>lùi, giữ staged</span></div>
+        <div class="row"><code>git reset --hard</code><span>lùi, xoá hết ⚠</span></div>
+        <div class="row"><code>git revert HEAD</code><span>đảo ngược an toàn</span></div>
+        <div class="row"><code>git restore f</code><span>bỏ sửa 1 file</span></div>
+      </div>
+      <div class="cg"><h3>Remote</h3>
+        <div class="row"><code>git push</code><span>đẩy lên</span></div>
+        <div class="row"><code>git pull</code><span>fetch + merge</span></div>
+        <div class="row"><code>git clone url</code><span>tải repo về</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <span>© <span id="yr"></span> Giải Mã</span>
+  <span><a href="../index.html">Trang chủ</a> · <a href="https://github.com/quaqducc/transformer_visualize" target="_blank" rel="noopener">GitHub ↗</a></span>
+</div></footer>
+
+<script>
+/* ============ ENGINE ============ */
+const FILES=["app.js","style.css","README.md"];
+function newRepo(){const files={};FILES.forEach(f=>files[f]="clean");return{commits:{},order:[],branches:{},head:{type:"branch",ref:"main"},remote:{},laneOf:{main:0},nextLane:1,seq:0,files};}
+const curBranch=s=>s.head.type==="branch"?s.head.ref:null;
+function headCommit(s){return s.head.type==="detached"?s.head.ref:(s.branches[s.head.ref]??null);}
+function ancestors(s,id){const set=new Set(),st=[id];while(st.length){const x=st.pop();if(x==null||set.has(x))continue;set.add(x);const c=s.commits[x];if(c)c.parents.forEach(p=>st.push(p));}return set;}
+const isAncestor=(s,a,b)=>a==null?true:ancestors(s,b).has(a);
+function mkCommit(s,parents,msg,lane){const id="c"+(++s.seq);s.commits[id]={id,parents:parents.filter(p=>p!=null),msg,seq:s.seq,lane,onRemote:false};s.order.push(id);return id;}
+function gc(s){const roots=[...Object.values(s.branches),...Object.values(s.remote)];if(s.head.type==="detached")roots.push(s.head.ref);const keep=new Set();roots.filter(r=>r!=null).forEach(r=>ancestors(s,r).forEach(id=>keep.add(id)));for(const id of Object.keys(s.commits))if(!keep.has(id))delete s.commits[id];s.order=s.order.filter(id=>keep.has(id));}
+function doEdit(s,f){if(s.files[f]==="clean"||s.files[f]==="staged")s.files[f]="modified";return{ok:true,cmd:`# sửa ${f}`,msg:`Bạn vừa sửa ${f} — nó ở Working Directory.`};}
+function doAdd(s,f){const tg=f==="."?Object.keys(s.files).filter(x=>s.files[x]==="modified"):[f];let n=0;tg.forEach(x=>{if(s.files[x]==="modified"){s.files[x]="staged";n++;}});if(!n)return{ok:false,msg:"Không có thay đổi nào để add."};return{ok:true,cmd:`git add ${f}`,msg:`Đưa ${tg.join(", ")} vào Staging.`};}
+function doCommit(s,msg){const staged=Object.keys(s.files).filter(f=>s.files[f]==="staged");if(!staged.length)return{ok:false,msg:"Không có gì trong Staging (git add trước)."};const b=curBranch(s);if(!b)return{ok:false,msg:"HEAD tách rời — không commit trên nhánh."};const parent=s.branches[b]??null,lane=s.laneOf[b]??0;const id=mkCommit(s,[parent],msg||"cập nhật",lane);s.branches[b]=id;staged.forEach(f=>s.files[f]="clean");return{ok:true,cmd:`git commit -m "${msg||"cập nhật"}"`,msg:`Tạo commit ${id} trên ${b}.`,add:id};}
+function doBranch(s,name){if(name in s.branches||name in s.laneOf)return{ok:false,msg:`Nhánh ${name} đã tồn tại.`};const cur=headCommit(s);if(cur==null)return{ok:false,msg:"Chưa có commit để tạo nhánh."};s.branches[name]=cur;s.laneOf[name]=s.nextLane++;return{ok:true,cmd:`git branch ${name}`,msg:`Tạo nhánh ${name}.`};}
+function doSwitch(s,name){if(!(name in s.branches))return{ok:false,msg:`Không có nhánh ${name}.`};s.head={type:"branch",ref:name};return{ok:true,cmd:`git switch ${name}`,msg:`HEAD → ${name}.`};}
+function doSwitchNew(s,name){const r=doBranch(s,name);if(!r.ok)return r;s.head={type:"branch",ref:name};return{ok:true,cmd:`git switch -c ${name}`,msg:`Tạo & chuyển sang ${name}.`};}
+function doCheckoutCommit(s,id){if(!(id in s.commits))return{ok:false};s.head={type:"detached",ref:id};return{ok:true,cmd:`git checkout ${id}`,msg:`HEAD tách rời (detached) tại ${id}.`};}
+function doMerge(s,other){const b=curBranch(s);if(!b)return{ok:false,msg:"Đang detached HEAD."};if(!(other in s.branches))return{ok:false,msg:`Không có nhánh ${other}.`};const t=s.branches[b],src=s.branches[other];if(src==null)return{ok:false,msg:`${other} chưa có commit.`};if(t===src||isAncestor(s,src,t))return{ok:false,msg:"Đã cập nhật, không có gì để gộp."};if(isAncestor(s,t,src)){s.branches[b]=src;return{ok:true,cmd:`git merge ${other}`,msg:`Fast-forward: ${b} tiến thẳng tới ${src}.`,ff:true};}const id=mkCommit(s,[t,src],`Merge ${other} vào ${b}`,s.laneOf[b]);s.branches[b]=id;return{ok:true,cmd:`git merge ${other}`,msg:`Merge commit ${id} (2 cha).`,add:id,merge:true};}
+function doRebase(s,base){const b=curBranch(s);if(!b)return{ok:false,msg:"Đang detached HEAD."};if(!(base in s.branches))return{ok:false,msg:`Không có nhánh ${base}.`};const baseTip=s.branches[base],featTip=s.branches[b];if(featTip==null)return{ok:false,msg:`${b} chưa có commit.`};if(isAncestor(s,featTip,baseTip))return{ok:false,msg:"Already up to date."};if(isAncestor(s,baseTip,featTip))return{ok:false,msg:`${b} đã trên đỉnh ${base}.`};const baseAnc=ancestors(s,baseTip),featAnc=ancestors(s,featTip);const diverged=[...featAnc].filter(id=>!baseAnc.has(id)).map(id=>s.commits[id]).sort((a,b)=>a.seq-b.seq);let parent=baseTip;for(const c of diverged){parent=mkCommit(s,[parent],c.msg,s.laneOf[b]);}s.branches[b]=parent;gc(s);return{ok:true,cmd:`git rebase ${base}`,msg:`Rebase ${b} lên ${base}: phát lại ${diverged.length} commit (hash mới).`};}
+function doReset(s,mode){const b=curBranch(s);if(!b)return{ok:false,msg:"Đang detached HEAD."};const cur=s.branches[b];if(cur==null)return{ok:false,msg:"Chưa có commit."};const parent=s.commits[cur].parents[0]??null;s.branches[b]=parent;const stt=mode==="soft"?"staged":mode==="mixed"?"modified":"clean";Object.keys(s.files).forEach(f=>s.files[f]=stt);gc(s);return{ok:true,cmd:`git reset --${mode} HEAD~1`,msg:`Lùi ${b} về ${parent||"(trống)"}; 3 vùng theo --${mode}.`};}
+function doRevert(s){const b=curBranch(s);if(!b)return{ok:false,msg:"Đang detached HEAD."};const cur=s.branches[b];if(cur==null)return{ok:false,msg:"Chưa có commit."};const id=mkCommit(s,[cur],`Revert "${s.commits[cur].msg}"`,s.laneOf[b]);s.branches[b]=id;return{ok:true,cmd:`git revert HEAD`,msg:`Commit đảo ngược ${id} (thêm lịch sử).`,add:id};}
+function doPush(s){const b=curBranch(s);if(!b)return{ok:false,msg:"Đang detached HEAD."};const local=s.branches[b];if(local==null)return{ok:false,msg:"Chưa có commit để push."};const rk="origin/"+b,rem=s.remote[rk]??null;if(rem===local)return{ok:false,msg:"Everything up-to-date."};if(rem!=null&&!isAncestor(s,rem,local))return{ok:false,msg:"! [rejected] remote có commit bạn chưa có → git pull trước."};s.remote[rk]=local;ancestors(s,local).forEach(id=>{if(s.commits[id])s.commits[id].onRemote=true;});return{ok:true,cmd:`git push`,msg:`Đẩy ${b} lên origin/${b}.`};}
+function doPull(s){const b=curBranch(s);if(!b)return{ok:false,msg:"Đang detached HEAD."};const rk="origin/"+b,rem=s.remote[rk]??null;if(rem==null)return{ok:false,msg:`Chưa có origin/${b} (push trước).`};const local=s.branches[b];if(local===rem)return{ok:false,msg:"Already up to date."};if(local==null||isAncestor(s,local,rem)){s.branches[b]=rem;return{ok:true,cmd:`git pull`,msg:`Fast-forward ${b} tới origin/${b}.`};}if(isAncestor(s,rem,local))return{ok:false,msg:"Local đã đi trước — chỉ cần push."};const id=mkCommit(s,[local,rem],`Merge origin/${b}`,s.laneOf[b]);s.branches[b]=id;return{ok:true,cmd:`git pull`,msg:`Gộp origin/${b} (merge commit ${id}).`,add:id};}
+function doFetch(s){return{ok:true,cmd:`git fetch`,msg:`Cập nhật origin/* (chưa gộp).`};}
+function colleaguePush(s){const rk="origin/main",base=s.remote[rk]??null;if(base==null)return{ok:false,msg:"Chưa có origin/main (push main lên trước)."};const id=mkCommit(s,[base],"Việc của đồng nghiệp",s.nextLane++);s.commits[id].onRemote=true;s.remote[rk]=id;return{ok:true,cmd:`# đồng nghiệp: git push`,msg:`origin/main tiến 1 commit bạn chưa có.`};}
+
+/* ============ STATE + RENDER ============ */
+const $=id=>document.getElementById(id);
+let st=newRepo(), logLines=[], newest=null, selCommit=null, replaying=false;
+const BRCOLORS={}; const PAL=['--gold','--cyan','--violet','--good'];
+function brColor(name){if(name==='main')return getCss('--accent');if(!(name in BRCOLORS)){const i=Object.keys(BRCOLORS).length%PAL.length;BRCOLORS[name]=PAL[i];}return getCss(BRCOLORS[name]);}
+function getCss(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function act(fn,...a){const r=fn(st,...a);if(r&&r.cmd!==undefined||r&&r.msg){logLines.push({cmd:r.cmd,msg:r.msg,ok:r.ok!==false});}if(r&&r.add)newest=r.add;return r;}
+
+function genOf(s){const g={};const vis=id=>{if(id==null)return -1;if(g[id]!=null)return g[id];const c=s.commits[id];if(!c)return -1;let m=-1;c.parents.forEach(p=>m=Math.max(m,vis(p)));return g[id]=m+1;};s.order.forEach(vis);return g;}
+function refsAt(s){const m={};const add=(id,ref,kind)=>{if(id==null)return;(m[id]=m[id]||[]).push({ref,kind});};Object.entries(s.branches).forEach(([n,id])=>add(id,n,'branch'));Object.entries(s.remote).forEach(([n,id])=>add(id,n,'remote'));if(s.head.type==='detached')add(s.head.ref,'HEAD','head');return m;}
+function renderGraph(){const s=st;const COL=78,LANE=64,R=16,PADX=40,PADY=34;const g=genOf(s);const ids=s.order.filter(id=>s.commits[id]);
+  let maxG=0,maxL=0;ids.forEach(id=>{maxG=Math.max(maxG,g[id]);maxL=Math.max(maxL,s.commits[id].lane);});
+  const W=Math.max(200,PADX*2+ (maxG+1)*COL + 120), H=Math.max(150,PADY*2+(maxL+1)*LANE);
+  const X=id=>PADX+g[id]*COL, Y=id=>PADY+s.commits[id].lane*LANE;
+  const hc=headCommit(s), refs=refsAt(s);
+  let e='',n='';
+  ids.forEach(id=>{const c=s.commits[id];c.parents.forEach(p=>{if(!s.commits[p])return;const x1=X(p),y1=Y(p),x2=X(id),y2=Y(id),mx=(x1+x2)/2;const cls=(c.parents.length>1&&p===c.parents[1])?'gedge m2':'gedge';e+=`<path class="${cls}" d="M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}"/>`;});});
+  ids.forEach(id=>{const c=s.commits[id];const x=X(id),y=Y(id);const cls=['gnode'];if(id===hc)cls.push('head');if(c.parents.length>1)cls.push('merge');if(c.onRemote)cls.push('remote');if(id===newest)cls.push('newest');if(id===selCommit)cls.push('sel');
+    n+=`<g class="${cls.join(' ')}" data-id="${id}" transform="translate(${x},${y})"><circle r="${R}"></circle><text class="h" y="1">${id}</text><text class="cmsg" y="${R+13}">${(c.msg||'').slice(0,14)}</text>`;
+    // refs
+    const rs=refs[id]||[];let ty=-R-10;rs.slice().reverse().forEach(rf=>{const isHead=(s.head.type==='branch'&&rf.kind==='branch'&&rf.ref===s.head.ref);const col=rf.kind==='remote'?getCss('--muted'):rf.kind==='head'?getCss('--accent'):brColor(rf.ref);const label=(rf.kind==='remote'?rf.ref:rf.ref)+(isHead?' ◄HEAD':'');const w=label.length*6.6+12;
+      n+=`<g class="gtag ${rf.kind==='remote'?'origin':''}"><rect x="${-w/2}" y="${ty-11}" width="${w}" height="16" rx="5" fill="${rf.kind==='remote'?'none':'color-mix(in srgb,'+col+' 22%, var(--surface))'}" stroke="${col}" stroke-width="1.4"></rect><text x="0" y="${ty-2}" text-anchor="middle" fill="${col}">${label}</text></g>`;ty-=20;});
+    n+='</g>';});
+  const svg=$('graph');svg.setAttribute('width',W);svg.setAttribute('height',H);svg.innerHTML=e+n;
+  svg.querySelectorAll('.gnode').forEach(el=>el.onclick=()=>{selCommit=el.dataset.id;const r=act(doCheckoutCommit,el.dataset.id);render();});
+  const gs=$('graphscroll');gs.scrollLeft=gs.scrollWidth;
+}
+function render(){renderGraph();
+  // areas
+  const cols={modified:$('aWork'),staged:$('aStage'),clean:$('aRepo')};Object.values(cols).forEach(c=>c.innerHTML='');
+  Object.entries(st.files).forEach(([f,state])=>{const el=document.createElement('div');el.className='fchip '+state;el.innerHTML=`<span>${f}</span><span>${state==='modified'?'✎':state==='staged'?'✓':''}</span>`;if(state==='staged')el.onclick=()=>{act(doAdd,'.');render();};cols[state].appendChild(el);});
+  // status
+  const b=curBranch(st);$('status').innerHTML=st.head.type==='detached'?`HEAD tách rời tại <b>${st.head.ref}</b>`:`Trên nhánh <b>${b}</b>${st.branches[b]?' · '+st.branches[b]:' (chưa có commit)'}`;
+  // selects
+  const brs=Object.keys(st.branches);const fill=(sel,excludeCur)=>{const cur=curBranch(st);sel.innerHTML=brs.filter(x=>!excludeCur||x!==cur).map(x=>`<option>${x}</option>`).join('')||'<option disabled>—</option>';};
+  fill($('selSwitch'),false);fill($('selMerge'),true);fill($('selRebase'),true);
+  // terminal
+  $('term').innerHTML=logLines.map(l=>`<div>${l.cmd?`<span class="${l.ok?'c':'k'}">${l.cmd.startsWith('#')?'':'$ '}${esc(l.cmd)}</span>`:''}${l.msg?`<div class="m">${esc(l.msg)}</div>`:''}</div>`).join('');const tb=$('term');tb.scrollTop=tb.scrollHeight;
+  // enable/disable
+  $('bCommit').disabled=!Object.values(st.files).some(v=>v==='staged');
+  $('bAdd').disabled=!Object.values(st.files).some(v=>v==='modified');
+}
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function run(fn,...a){act(fn,...a);render();}
+
+/* ============ CONTROLS ============ */
+document.querySelectorAll('[data-a="edit"]').forEach(b=>b.onclick=()=>run(doEdit,b.dataset.f));
+$('bAdd').onclick=()=>run(doAdd,'.');
+$('bCommit').onclick=()=>run(doCommit,$('msg').value||'cập nhật');
+$('bSwitchNew').onclick=()=>run(doSwitchNew,($('brName').value||'feature').trim());
+$('bSwitch').onclick=()=>{const v=$('selSwitch').value;if(v)run(doSwitch,v);};
+$('bMerge').onclick=()=>{const v=$('selMerge').value;if(v)run(doMerge,v);};
+$('bRebase').onclick=()=>{const v=$('selRebase').value;if(v)run(doRebase,v);};
+$('bCheckout').onclick=()=>{if(selCommit)run(doCheckoutCommit,selCommit);};
+$('bSoft').onclick=()=>run(doReset,'soft');$('bMixed').onclick=()=>run(doReset,'mixed');
+$('bHard').onclick=()=>{if(confirm('reset --hard sẽ XOÁ thay đổi chưa commit. Tiếp tục?'))run(doReset,'hard');};
+$('bRevert').onclick=()=>run(doRevert);
+$('bPush').onclick=()=>run(doPush);$('bPull').onclick=()=>run(doPull);$('bFetch').onclick=()=>run(doFetch);$('bColleague').onclick=()=>run(colleaguePush);
+$('resetRepo').onclick=()=>{st=newRepo();logLines=[];newest=null;selCommit=null;render();};
+
+/* ============ THEME ============ */
+$('yr').textContent=new Date().getFullYear();
+const htmlEl=document.documentElement,tb=$('themeBtn');
+const eff=()=>htmlEl.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+const paintT=()=>tb.textContent=eff()==='dark'?'🌙':'☀️';
+tb.onclick=()=>{const nx=eff()==='dark'?'light':'dark';htmlEl.dataset.theme=nx;try{localStorage.setItem('giaima-theme',nx);}catch(e){}paintT();for(const k in BRCOLORS)delete BRCOLORS[k];render();};
+matchMedia('(prefers-color-scheme: light)').addEventListener('change',()=>{paintT();render();});paintT();
+
+/* ============ SCENARIOS (guided tour) ============ */
+const SCN=[
+ {id:'A',name:'1 · Lần commit đầu tiên',desc:'add → commit, hiểu 3 vùng',steps:[
+   {title:'Bắt đầu: repo trống',text:'Chưa có commit nào. Cùng tạo mốc đầu tiên. Trước hết ta sửa một file.'},
+   {do:()=>act(doEdit,'app.js'),title:'Sửa file',text:'app.js chuyển sang Working Directory (màu vàng) — Git đang theo dõi nhưng chưa lưu.'},
+   {do:()=>act(doAdd,'.'),title:'git add',text:'Đưa thay đổi vào Staging (xanh) — như bỏ món vào giỏ để chuẩn bị "thanh toán".'},
+   {do:()=>act(doCommit,'khởi tạo dự án'),title:'git commit',text:'Một commit ra đời trên đồ thị. HEAD và main trượt tới nó. File về trạng thái đã lưu.'},
+ ]},
+ {id:'B',name:'2 · Nhánh & merge',desc:'tách nhánh sửa bug rồi gộp về',steps:[
+   {do:()=>{act(doEdit,'app.js');act(doAdd,'.');act(doCommit,'khởi tạo');},title:'Có sẵn 1 commit trên main',text:'Ta bắt đầu với main đã có commit đầu.'},
+   {do:()=>act(doSwitchNew,'bugfix'),title:'Tạo nhánh bugfix',text:'switch -c tạo & nhảy sang nhánh mới. Nhãn bugfix xuất hiện cùng chỗ main.'},
+   {do:()=>{act(doEdit,'style.css');act(doAdd,'.');act(doCommit,'sửa bug CSS');},title:'Commit trên bugfix',text:'Nhánh bugfix trượt sang làn riêng — đồ thị tách nhánh. main vẫn đứng yên.'},
+   {do:()=>act(doSwitch,'main'),title:'Về main',text:'HEAD nhảy về main.'},
+   {do:()=>{act(doEdit,'README.md');act(doAdd,'.');act(doCommit,'cập nhật docs');},title:'main cũng đi tiếp',text:'Giờ hai nhánh đã đi theo hai hướng khác nhau.'},
+   {do:()=>act(doMerge,'bugfix'),title:'git merge bugfix',text:'Vì cả hai đã đi riêng → tạo MERGE COMMIT có 2 cha, nối hai dòng thời gian lại. Đây là merge 3-way.'},
+ ]},
+ {id:'C',name:'3 · Merge vs Rebase',desc:'cùng tình huống, hai cách kể chuyện',steps:[
+   {do:()=>{act(doEdit,'app.js');act(doAdd,'.');act(doCommit,'base');act(doSwitchNew,'feature');act(doEdit,'style.css');act(doAdd,'.');act(doCommit,'F1');act(doEdit,'style.css');act(doAdd,'.');act(doCommit,'F2');act(doSwitch,'main');act(doEdit,'README.md');act(doAdd,'.');act(doCommit,'M1');act(doSwitch,'feature');},title:'Tình huống: feature & main đã tách',text:'feature có F1,F2; main có M1. Đang đứng ở feature. Ta sẽ REBASE feature lên main.'},
+   {do:()=>act(doRebase,'main'),title:'git rebase main',text:'F1,F2 được PHÁT LẠI lên đỉnh main → lịch sử thẳng tắp, KHÔNG có merge commit. Để ý: chúng là commit MỚI (hash khác).'},
+   {title:'So sánh',text:'Nhớ kịch bản 2 (merge) có ngã ba + 1 merge commit? Rebase cho đường thẳng gọn hơn. Đổi lại, nó viết lại lịch sử — nên đừng rebase nhánh đã chia sẻ.'},
+ ]},
+ {id:'D',name:'4 · Lỡ tay: reset & revert',desc:'undo an toàn và không an toàn',steps:[
+   {do:()=>{act(doEdit,'app.js');act(doAdd,'.');act(doCommit,'tốt');act(doEdit,'app.js');act(doAdd,'.');act(doCommit,'commit lỗi');},title:'Có 2 commit, cái cuối bị lỗi',text:'Muốn bỏ "commit lỗi". Có hai cách.'},
+   {do:()=>act(doReset,'hard'),title:'reset --hard HEAD~1',text:'Tua main về commit trước; commit lỗi biến mất khỏi lịch sử, mọi thay đổi bị xoá. Mạnh nhưng NGUY HIỂM (mất việc chưa lưu).'},
+   {title:'Nếu nhánh đã chia sẻ?',text:'Đừng reset lịch sử chung. Thay vào đó dùng revert: tạo một commit ĐẢO NGƯỢC — lịch sử được thêm chứ không xoá.'},
+   {do:()=>{act(doEdit,'app.js');act(doAdd,'.');act(doCommit,'commit lỗi #2');act(doRevert);},title:'git revert HEAD',text:'Commit "Revert…" xuất hiện, hoàn tác commit lỗi mà vẫn giữ nguyên lịch sử. An toàn cho làm việc nhóm.'},
+ ]},
+ {id:'E',name:'5 · Làm việc nhóm: push/pull',desc:'khi server có commit bạn chưa có',steps:[
+   {do:()=>{act(doEdit,'app.js');act(doAdd,'.');act(doCommit,'việc của tôi');act(doPush);},title:'push lần đầu',text:'Đẩy main lên origin/main (nét đứt = con trỏ trên server).'},
+   {do:()=>act(colleaguePush),title:'Đồng nghiệp push',text:'origin/main tiến 1 commit mà bạn chưa có — local của bạn đã lỗi thời.'},
+   {do:()=>{act(doEdit,'README.md');act(doAdd,'.');act(doCommit,'thêm việc');},title:'Bạn commit tiếp',text:'Giờ local và server đã đi theo hai hướng (diverge).'},
+   {do:()=>act(doPush),title:'push → bị từ chối',text:'Git từ chối vì server có commit bạn chưa có (xem dòng đỏ ở terminal). Phải pull trước.'},
+   {do:()=>act(doPull),title:'git pull',text:'pull = fetch + merge → tạo merge commit gộp việc của bạn với việc đồng nghiệp.'},
+   {do:()=>act(doPush),title:'push lại',text:'Lần này thành công. origin/main bắt kịp local. Xong!'},
+ ]},
+];
+let scn=null,si=0;
+function scnList(){$('scnList').innerHTML=SCN.map((s,i)=>`<button data-i="${i}"><b>${s.name}</b><span class="d">${s.desc}</span></button>`).join('');
+  $('scnList').querySelectorAll('button').forEach(b=>b.onclick=()=>startScn(+b.dataset.i));}
+function startScn(i){scn=SCN[i];si=0;$('veil').classList.add('hidden');$('tour').classList.add('on');gotoStep(0);}
+function gotoStep(k){si=Math.max(0,Math.min(scn.steps.length-1,k));st=newRepo();logLines=[];newest=null;selCommit=null;for(let i=0;i<=si;i++){const stp=scn.steps[i];if(stp.do)stp.do();}render();const stp=scn.steps[si];
+  $('tstep').textContent=`${scn.name} — bước ${si+1}/${scn.steps.length}`;$('ttitle').textContent=stp.title;$('ttext').textContent=stp.text;
+  $('tdots').innerHTML=scn.steps.map((_,i)=>`<span class="d ${i===si?'on':''}"></span>`).join('');$('tprev').disabled=si===0;$('tnext').textContent=si===scn.steps.length-1?'Xong ✓':'Tiếp ›';}
+$('tnext').onclick=()=>{if(si>=scn.steps.length-1){endTour();}else gotoStep(si+1);};
+$('tprev').onclick=()=>gotoStep(si-1);
+$('texit').onclick=endTour;
+function endTour(){$('tour').classList.remove('on');scn=null;}
+$('tourBtn').onclick=()=>{$('veil').classList.remove('hidden');endTour();};
+$('freeplay').onclick=()=>{$('veil').classList.add('hidden');};
+
+/* init */
+scnList();render();
+</script>
+</body>
+</html>
